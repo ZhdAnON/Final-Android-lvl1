@@ -1,3 +1,14 @@
 <resources>
     <string name="app_name">SkillCinema</string>
+    <string name="bottom_menu_home">Главная</string>
+    <string name="bottom_menu_search">Поиск</string>
+    <string name="bottom_menu_profile">Профиль</string>
+    <string name="intro_btn_skip">Пропустить</string>
+    <string name="intro_first_description">Узнавай\nо премьерах</string>
+    <string name="intro_description_second">Создавай\nколлекции</string>
+    <string name="intro_description_third">Делись\nс друзьями</string>
+    <string name="intro_btn_to_work">Начать работу</string>
+    <string name="btn_show_all_top">Все</string>
+    <string name="btn_show_all_end">Показать все</string>
+    <string name="btn_try_again">Поптобовать ещё раз…</string>
 </resources>
