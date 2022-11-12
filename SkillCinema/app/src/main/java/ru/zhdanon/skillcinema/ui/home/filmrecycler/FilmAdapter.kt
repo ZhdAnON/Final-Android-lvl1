@@ -12,7 +12,7 @@ class FilmAdapter(
     private val maxListSize: Int,
     private val clickNextButton: () -> Unit,
     private val clickFilms: (filmId: Int) -> Unit
-) : ListAdapter<HomeItem, FilmViewHolder>(Diff()) {
+) : ListAdapter<HomeItem, FilmViewHolder>(DiffFilm()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) = FilmViewHolder(
         ItemFilmBinding.inflate(LayoutInflater.from(parent.context), parent, false)

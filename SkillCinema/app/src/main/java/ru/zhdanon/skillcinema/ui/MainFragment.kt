@@ -5,11 +5,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.ui.setupWithNavController
 import ru.zhdanon.skillcinema.R
 import ru.zhdanon.skillcinema.databinding.FragmentMainBinding
-import ru.zhdanon.skillcinema.ui.home.FragmentHome
-import ru.zhdanon.skillcinema.ui.profile.FragmentProfile
-import ru.zhdanon.skillcinema.ui.search.FragmentSearch
 
 class MainFragment : Fragment() {
 
@@ -27,23 +26,24 @@ class MainFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        childFragmentManager
-            .beginTransaction()
-            .replace(R.id.working_container, FragmentHome())
-            .commit()
 
+        val navHost =
+            childFragmentManager.findFragmentById(R.id.working_container) as NavHostFragment
+        val navController = navHost.navController
+
+        binding.bottomNavigation.setupWithNavController(navController)
         binding.bottomNavigation.setOnItemSelectedListener {
             when (it.itemId) {
                 R.id.home -> {
-                    loadFragment(FragmentHome())
+                    navController.navigate(R.id.fragmentHome)
                     true
                 }
                 R.id.search -> {
-                    loadFragment(FragmentSearch())
+                    navController.navigate(R.id.fragmentSearch)
                     true
                 }
                 else -> {
-                    loadFragment(FragmentProfile())
+                    navController.navigate(R.id.fragmentProfile)
                     true
                 }
             }
@@ -53,12 +53,5 @@ class MainFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
-    }
-
-    private fun loadFragment(fragment: Fragment) {
-        childFragmentManager
-            .beginTransaction()
-            .replace(R.id.working_container, fragment)
-            .commit()
     }
 }

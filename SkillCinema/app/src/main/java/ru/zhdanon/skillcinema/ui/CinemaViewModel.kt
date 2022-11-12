@@ -13,10 +13,10 @@ import ru.zhdanon.skillcinema.app.prepareToShow
 import ru.zhdanon.skillcinema.data.CategoriesFilms
 import ru.zhdanon.skillcinema.data.CinemaRepository
 import ru.zhdanon.skillcinema.data.TOP_TYPES
+import ru.zhdanon.skillcinema.data.actorsbyfilmid.ResponseActorsByFilmId
 import ru.zhdanon.skillcinema.data.filmbyid.ResponseCurrentFilm
-import ru.zhdanon.skillcinema.domain.GetFilmByIdUseCase
-import ru.zhdanon.skillcinema.domain.GetPremierFilmUseCase
-import ru.zhdanon.skillcinema.domain.GetTopFilmsUseCase
+import ru.zhdanon.skillcinema.data.filmgallery.ItemImageGallery
+import ru.zhdanon.skillcinema.domain.*
 import ru.zhdanon.skillcinema.entity.HomeItem
 import java.util.*
 
@@ -26,6 +26,8 @@ class CinemaViewModel : ViewModel() {
     private val getTopFilmsUseCase = GetTopFilmsUseCase(repository)
     private val getPremierFilmUseCase = GetPremierFilmUseCase(repository)
     private val getFilmByIdUseCase = GetFilmByIdUseCase(repository)
+    private val getActorsByFilmIdUseCase = GetActorsListUseCase(repository)
+    private val getGalleryByIdUseCase = GetGalleryByIdUseCase(repository)
 
     private val calendar = Calendar.getInstance()
 
@@ -35,6 +37,15 @@ class CinemaViewModel : ViewModel() {
 
     private val _currentFilm = MutableSharedFlow<ResponseCurrentFilm>()
     val currentFilm = _currentFilm.asSharedFlow()
+
+    private val _currentFilmActors = MutableStateFlow<List<ResponseActorsByFilmId>>(emptyList())
+    val currentFilmActors = _currentFilmActors.asStateFlow()
+
+    private val _currentFilmMakers = MutableStateFlow<List<ResponseActorsByFilmId>>(emptyList())
+    val currentFilmMakers = _currentFilmMakers.asStateFlow()
+
+    private val _currentFilmGallery = MutableStateFlow<List<ItemImageGallery>>(emptyList())
+    val currentFilmGallery = _currentFilmGallery.asStateFlow()
 
     private val _loadCategoryState = MutableStateFlow<StateLoading>(StateLoading.Default)
     val loadCategoryState = _loadCategoryState.asStateFlow()
@@ -94,13 +105,28 @@ class CinemaViewModel : ViewModel() {
         viewModelScope.launch {
             try {
                 _loadCurrentFilmState.value = StateLoading.Loading
-                val temp = getFilmByIdUseCase.executeFilmById(filmId)
-                _currentFilm.emit(temp)
+                val tempFilm = getFilmByIdUseCase.executeFilmById(filmId)
+                _currentFilm.emit(tempFilm)
+                val tempActorList = getActorsByFilmIdUseCase.executeActorsList(filmId)
+                _currentFilmGallery.value = getGalleryByIdUseCase
+                    .executeGalleryByFilmId(filmId, "SCREENSHOT", 1).items
+                sortingActorsAndMakers(tempActorList)
                 _loadCurrentFilmState.value = StateLoading.Success
             } catch (e: Throwable) {
                 _loadCurrentFilmState.value = StateLoading.Error(e.message.toString())
             }
         }
+    }
+
+    private fun sortingActorsAndMakers(actorsList: List<ResponseActorsByFilmId>) {
+        val actors = mutableListOf<ResponseActorsByFilmId>()
+        val makers = mutableListOf<ResponseActorsByFilmId>()
+        actorsList.forEach {
+            if (it.professionKey == "ACTOR") actors.add(it)
+            else makers.add(it)
+        }
+        _currentFilmActors.value = actors
+        _currentFilmMakers.value = makers
     }
 
     companion object {

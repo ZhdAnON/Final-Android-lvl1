@@ -3,11 +3,12 @@ package ru.zhdanon.skillcinema.ui
 import android.os.Bundle
 import android.preference.PreferenceManager
 import androidx.appcompat.app.AppCompatActivity
+import androidx.navigation.fragment.NavHostFragment
 import ru.zhdanon.skillcinema.R
 import ru.zhdanon.skillcinema.databinding.ActivityMainBinding
 import ru.zhdanon.skillcinema.ui.intro.IntroFragment
 
-const val TAG = "AAAAA"
+const val TAG = "ru.zhdanon.skillcinema.ui"
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
@@ -17,18 +18,14 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        val navHost = supportFragmentManager.findFragmentById(R.id.main_container) as NavHostFragment
+        val navController = navHost.navController
+
         PreferenceManager.getDefaultSharedPreferences(this).apply {
             if (!getBoolean(IntroFragment.PREFERENCES_NAME, false)) {
-                supportFragmentManager
-                    .beginTransaction()
-                    .replace(R.id.main_container, IntroFragment())
-                    .commit()
-
+                navController.navigate(R.id.introFragment)
             } else {
-                supportFragmentManager
-                    .beginTransaction()
-                    .replace(R.id.main_container, MainFragment())
-                    .commit()
+                navController.navigate(R.id.mainFragment)
             }
         }
     }

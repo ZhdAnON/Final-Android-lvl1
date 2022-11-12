@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/nav_graph_without_intro"
+    app:startDestination="@id/fragmentHome">
+    <fragment
+        android:id="@+id/fragmentHome"
+        android:name="ru.zhdanon.skillcinema.ui.home.FragmentHome"
+        android:label="FragmentHome" >
+        <action
+            android:id="@+id/action_fragmentHome_to_fragmentFilmDetail"
+            app:popUpTo="@layout/fragment_main"
+            app:destination="@id/fragmentFilmDetail" />
+    </fragment>
+    <fragment
+        android:id="@+id/fragmentSearch"
+        android:name="ru.zhdanon.skillcinema.ui.search.FragmentSearch"
+        android:label="FragmentSearch" />
+    <fragment
+        android:id="@+id/fragmentProfile"
+        android:name="ru.zhdanon.skillcinema.ui.profile.FragmentProfile"
+        android:label="FragmentProfile" />
+    <fragment
+        android:id="@+id/fragmentFilmDetail"
+        android:name="ru.zhdanon.skillcinema.ui.filmdetail.FragmentFilmDetail"
+        android:label="FragmentFilmDetail" />
+</navigation>

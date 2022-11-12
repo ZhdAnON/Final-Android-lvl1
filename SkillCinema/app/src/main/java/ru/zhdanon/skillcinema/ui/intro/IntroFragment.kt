@@ -2,15 +2,13 @@ package ru.zhdanon.skillcinema.ui.intro
 
 import android.os.Bundle
 import android.preference.PreferenceManager
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import ru.zhdanon.skillcinema.R
 import ru.zhdanon.skillcinema.databinding.IntroFragmentBinding
-import ru.zhdanon.skillcinema.ui.MainFragment
-import ru.zhdanon.skillcinema.ui.TAG
 
 class IntroFragment : Fragment() {
 
@@ -38,6 +36,7 @@ class IntroFragment : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
+        findNavController().clearBackStack(R.id.introFragment)
         _binding = null
     }
 
@@ -46,12 +45,7 @@ class IntroFragment : Fragment() {
             putBoolean(PREFERENCES_NAME, true)
             apply()
         }
-        Log.d(TAG, "skipIntroClick: ")
-//        findNavController().navigate(R.id.action_introFragment_to_mainFragment)
-        parentFragmentManager
-            .beginTransaction()
-            .replace(R.id.main_container, MainFragment())
-            .commit()
+        findNavController().navigate(R.id.action_introFragment_to_mainFragment)
     }
 
     companion object {

@@ -15,6 +15,11 @@ class CinemaRepository {
 
     suspend fun getFilmById(filmId: Int) = retrofit.getCurrentFilm(filmId)
 
+    suspend fun getActorsByFilmId(filmId: Int) = retrofit.getActors(filmId)
+
+    suspend fun getGalleryByFilmId(filmId: Int, type: String, page: Int) =
+        retrofit.getFilmImages(filmId, type, page)
+
     suspend fun getFilmsByFilter(
         countries: String = "",
         genres: String = "",
@@ -55,6 +60,6 @@ class CinemaRepository {
     }
 
     companion object {
-        private const val BASE_URL = "https://kinopoiskapiunofficial.tech/api/v2.2/"
+        private const val BASE_URL = "https://kinopoiskapiunofficial.tech/api/"
     }
 }
