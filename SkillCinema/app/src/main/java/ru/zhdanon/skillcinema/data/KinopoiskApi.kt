@@ -63,7 +63,7 @@ interface KinopoiskApi {
     ): ResponseByFilter
 
     companion object {
-//        private const val API_KEY = "ffcd0204-2065-4214-b6ae-aa29f5fe4003"
-        private const val API_KEY_2 = "f746dfa5-8093-401b-8df2-e84042f3dc96"
+        private const val API_KEY_2 = "ffcd0204-2065-4214-b6ae-aa29f5fe4003"
+//        private const val API_KEY_2 = "f746dfa5-8093-401b-8df2-e84042f3dc96"
     }
 }

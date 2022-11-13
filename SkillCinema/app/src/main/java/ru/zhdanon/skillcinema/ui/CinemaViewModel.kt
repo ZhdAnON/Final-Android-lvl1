@@ -2,53 +2,75 @@ package ru.zhdanon.skillcinema.ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
+import androidx.paging.cachedIn
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import ru.zhdanon.skillcinema.app.converterInMonth
 import ru.zhdanon.skillcinema.app.prepareToShow
 import ru.zhdanon.skillcinema.data.CategoriesFilms
-import ru.zhdanon.skillcinema.data.CinemaRepository
 import ru.zhdanon.skillcinema.data.TOP_TYPES
 import ru.zhdanon.skillcinema.data.actorsbyfilmid.ResponseActorsByFilmId
 import ru.zhdanon.skillcinema.data.filmbyid.ResponseCurrentFilm
 import ru.zhdanon.skillcinema.data.filmgallery.ItemImageGallery
 import ru.zhdanon.skillcinema.domain.*
 import ru.zhdanon.skillcinema.entity.HomeItem
+import ru.zhdanon.skillcinema.ui.allfilmsbycategory.allfilmadapter.AllFilmAdapter
+import ru.zhdanon.skillcinema.ui.allfilmsbycategory.allfilmadapter.AllFilmPagingSource
 import java.util.*
+import javax.inject.Inject
 
-class CinemaViewModel : ViewModel() {
-
-    private val repository = CinemaRepository()
-    private val getTopFilmsUseCase = GetTopFilmsUseCase(repository)
-    private val getPremierFilmUseCase = GetPremierFilmUseCase(repository)
-    private val getFilmByIdUseCase = GetFilmByIdUseCase(repository)
-    private val getActorsByFilmIdUseCase = GetActorsListUseCase(repository)
-    private val getGalleryByIdUseCase = GetGalleryByIdUseCase(repository)
-
+@HiltViewModel
+class CinemaViewModel @Inject constructor(
+    private val getTopFilmsUseCase: GetTopFilmsUseCase,
+    private val getPremierFilmUseCase: GetPremierFilmUseCase,
+    private val getFilmByIdUseCase: GetFilmByIdUseCase,
+    private val getActorsByFilmIdUseCase: GetActorsListUseCase,
+    private val getGalleryByIdUseCase: GetGalleryByIdUseCase
+) : ViewModel() {
     private val calendar = Calendar.getInstance()
 
+    // FragmentHome
     private val _homePageList =
         MutableStateFlow<List<HomeList>>(emptyList())
     val homePageList = _homePageList.asStateFlow()
 
-    private val _currentFilm = MutableSharedFlow<ResponseCurrentFilm>()
-    val currentFilm = _currentFilm.asSharedFlow()
-
-    private val _currentFilmActors = MutableStateFlow<List<ResponseActorsByFilmId>>(emptyList())
-    val currentFilmActors = _currentFilmActors.asStateFlow()
-
-    private val _currentFilmMakers = MutableStateFlow<List<ResponseActorsByFilmId>>(emptyList())
-    val currentFilmMakers = _currentFilmMakers.asStateFlow()
-
-    private val _currentFilmGallery = MutableStateFlow<List<ItemImageGallery>>(emptyList())
-    val currentFilmGallery = _currentFilmGallery.asStateFlow()
-
     private val _loadCategoryState = MutableStateFlow<StateLoading>(StateLoading.Default)
     val loadCategoryState = _loadCategoryState.asStateFlow()
+
+    // FragmentAllFilms
+    private var allFilmAdapter: AllFilmAdapter = AllFilmAdapter {  }
+    private lateinit var currentCategory: CategoriesFilms
+
+    val allFilmsByCategory: Flow<PagingData<HomeItem>> = Pager(
+        config = PagingConfig(pageSize = 20),
+        pagingSourceFactory = {
+            AllFilmPagingSource(
+                categoriesFilms = currentCategory,
+                year = calendar.get(Calendar.YEAR),
+                month = (calendar.get(Calendar.MONTH) + 1).converterInMonth(),
+                getPremierFilmUseCase, getTopFilmsUseCase
+            )
+        }
+    ).flow.cachedIn(viewModelScope)
+
+    // FragmentFilmDetail
+    private val _currentFilm = MutableSharedFlow<ResponseCurrentFilm>()
+
+    val currentFilm = _currentFilm.asSharedFlow()
+    private val _currentFilmActors = MutableStateFlow<List<ResponseActorsByFilmId>>(emptyList())
+
+    val currentFilmActors = _currentFilmActors.asStateFlow()
+    private val _currentFilmMakers = MutableStateFlow<List<ResponseActorsByFilmId>>(emptyList())
+
+    val currentFilmMakers = _currentFilmMakers.asStateFlow()
+    private val _currentFilmGallery = MutableStateFlow<List<ItemImageGallery>>(emptyList())
+
+    val currentFilmGallery = _currentFilmGallery.asStateFlow()
 
     private val _loadCurrentFilmState = MutableStateFlow<StateLoading>(StateLoading.Default)
     val loadCurrentFilmState = _loadCurrentFilmState.asStateFlow()
@@ -99,6 +121,17 @@ class CinemaViewModel : ViewModel() {
                 _loadCategoryState.value = StateLoading.Error(e.message.toString())
             }
         }
+    }
+
+    fun setCurrentCategory(category: CategoriesFilms) {
+        currentCategory = category
+        if (allFilmAdapter.itemCount != 0) allFilmAdapter.refresh()
+    }
+    fun getCurrentCategory() = currentCategory
+
+    fun getAllFilmAdapter() = allFilmAdapter
+    fun setAllFilmAdapter(adapter: AllFilmAdapter) {
+        allFilmAdapter = adapter
     }
 
     fun getFilmById(filmId: Int) {

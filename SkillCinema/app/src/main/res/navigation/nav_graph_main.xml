@@ -1,16 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph_without_intro"
     app:startDestination="@id/fragmentHome">
     <fragment
         android:id="@+id/fragmentHome"
         android:name="ru.zhdanon.skillcinema.ui.home.FragmentHome"
+        tools:layout="@layout/fragment_home"
         android:label="FragmentHome" >
         <action
             android:id="@+id/action_fragmentHome_to_fragmentFilmDetail"
-            app:popUpTo="@layout/fragment_main"
+            app:popUpTo="@id/fragmentHome"
             app:destination="@id/fragmentFilmDetail" />
+        <action
+            app:popUpTo="@id/fragmentHome"
+            android:id="@+id/action_fragmentHome_to_fragmentAllFilms"
+            app:destination="@id/fragmentAllFilms" />
     </fragment>
     <fragment
         android:id="@+id/fragmentSearch"
@@ -22,6 +28,22 @@
         android:label="FragmentProfile" />
     <fragment
         android:id="@+id/fragmentFilmDetail"
+        tools:layout="@layout/fragment_film_detail"
         android:name="ru.zhdanon.skillcinema.ui.filmdetail.FragmentFilmDetail"
-        android:label="FragmentFilmDetail" />
+        android:label="FragmentFilmDetail" >
+        <argument
+            android:name="keyNav"
+            app:argType="string"
+            android:defaultValue="FRAGMENT_HOME" />
+    </fragment>
+    <fragment
+        tools:layout="@layout/fragment_all_films"
+        android:id="@+id/fragmentAllFilms"
+        android:name="ru.zhdanon.skillcinema.ui.allfilmsbycategory.FragmentAllFilms"
+        android:label="FragmentAllFilms" >
+        <action
+            app:popUpTo="@id/fragmentAllFilms"
+            android:id="@+id/action_fragmentAllFilms_to_fragmentFilmDetail"
+            app:destination="@id/fragmentFilmDetail" />
+    </fragment>
 </navigation>

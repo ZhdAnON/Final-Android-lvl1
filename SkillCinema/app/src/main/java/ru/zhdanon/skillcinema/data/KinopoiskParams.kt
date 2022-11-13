@@ -1,11 +1,5 @@
 package ru.zhdanon.skillcinema.data
 
-enum class CategoriesFilms(val text: String) {
-    BEST("ТОП-250"),
-    POPULAR("Популярное"),
-    PREMIERS("Премьеры"),
-    AWAIT("Самые ожиаемые")
-}
 val TOP_TYPES = mapOf(
     CategoriesFilms.BEST to "TOP_250_BEST_FILMS",
     CategoriesFilms.POPULAR to "TOP_100_POPULAR_FILMS",

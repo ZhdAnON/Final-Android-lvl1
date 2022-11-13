@@ -1,6 +1,7 @@
 package ru.zhdanon.skillcinema.ui.filmdetail
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -9,7 +10,9 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.NavOptions
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.coroutines.flow.launchIn
@@ -23,8 +26,11 @@ import ru.zhdanon.skillcinema.data.filmgallery.ItemImageGallery
 import ru.zhdanon.skillcinema.databinding.FragmentFilmDetailBinding
 import ru.zhdanon.skillcinema.ui.CinemaViewModel
 import ru.zhdanon.skillcinema.ui.StateLoading
+import ru.zhdanon.skillcinema.ui.TAG
+import ru.zhdanon.skillcinema.ui.allfilmsbycategory.FragmentAllFilms
 import ru.zhdanon.skillcinema.ui.filmdetail.actorsadapter.ActorsAdapter
 import ru.zhdanon.skillcinema.ui.filmdetail.galleryadapter.GalleryAdapter
+import ru.zhdanon.skillcinema.ui.home.FragmentHome
 
 class FragmentFilmDetail : Fragment() {
     private var _binding: FragmentFilmDetailBinding? = null
@@ -47,6 +53,8 @@ class FragmentFilmDetail : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        val navArg: FragmentFilmDetailArgs by navArgs()
+
         stateLoadingListener()
 
         setFilmDetails()
@@ -54,7 +62,27 @@ class FragmentFilmDetail : Fragment() {
         setFilmMakers()
         setFilmGallery()
 
-        binding.btnBack.setOnClickListener { findNavController().navigate(R.id.fragmentHome) }
+        binding.btnBack.setOnClickListener {
+            Log.d(TAG, "onViewCreated: ${navArg.keyNav}")
+            when (navArg.keyNav) {
+                FragmentHome.KEY_NAV_FRAGMENT_HOME ->
+                    findNavController().navigate(
+                        resId = R.id.fragmentHome,
+                        args = null,
+                        navOptions = NavOptions.Builder()
+                            .setPopUpTo(R.id.fragmentHome, true)
+                            .build()
+                    )
+                FragmentAllFilms.KEY_NAV_FRAGMENT_ALL_FILMS ->
+                    findNavController().navigate(
+                        resId = R.id.fragmentAllFilms,
+                        args = null,
+                        navOptions = NavOptions.Builder()
+                            .setPopUpTo(R.id.fragmentAllFilms, true)
+                            .build()
+                    )
+            }
+        }
     }
 
     override fun onDestroyView() {

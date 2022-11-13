@@ -5,8 +5,9 @@ import retrofit2.converter.moshi.MoshiConverterFactory
 import ru.zhdanon.skillcinema.data.filmbyfilter.FilmByFilter
 import ru.zhdanon.skillcinema.data.filmspremier.FilmPremier
 import ru.zhdanon.skillcinema.entity.HomeItem
+import javax.inject.Inject
 
-class CinemaRepository {
+class CinemaRepository @Inject constructor() {
     private val retrofit: KinopoiskApi = Retrofit.Builder()
         .baseUrl(BASE_URL)
         .addConverterFactory(MoshiConverterFactory.create())

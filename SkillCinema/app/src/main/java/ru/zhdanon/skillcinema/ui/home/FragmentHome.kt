@@ -4,11 +4,11 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -17,7 +17,6 @@ import ru.zhdanon.skillcinema.data.CategoriesFilms
 import ru.zhdanon.skillcinema.databinding.FragmentHomeBinding
 import ru.zhdanon.skillcinema.ui.CinemaViewModel
 import ru.zhdanon.skillcinema.ui.StateLoading
-import ru.zhdanon.skillcinema.ui.filmdetail.FragmentFilmDetail
 import ru.zhdanon.skillcinema.ui.home.categoryrecycler.CategoryAdapter
 
 class FragmentHome : Fragment() {
@@ -60,16 +59,15 @@ class FragmentHome : Fragment() {
     }
 
     private fun onClickFilm(filmId: Int) {
+        val action =
+            FragmentHomeDirections.actionFragmentHomeToFragmentFilmDetail(KEY_NAV_FRAGMENT_HOME)
         viewModel.getFilmById(filmId)
-        parentFragmentManager
-            .beginTransaction()
-            .replace(R.id.working_container, FragmentFilmDetail())
-            .addToBackStack(null)
-            .commit()
+        findNavController().navigate(action)
     }
 
     private fun onClickShoAllButton(category: CategoriesFilms) {
-        Toast.makeText(requireContext(), category.text, Toast.LENGTH_SHORT).show()
+        viewModel.setCurrentCategory(category)
+        findNavController().navigate(R.id.action_fragmentHome_to_fragmentAllFilms)
     }
 
     private fun stateLoadingListener() {
@@ -94,5 +92,9 @@ class FragmentHome : Fragment() {
                 }
             }
         }.launchIn(viewLifecycleOwner.lifecycleScope)
+    }
+
+    companion object {
+        const val KEY_NAV_FRAGMENT_HOME = "Fragment Home"
     }
 }

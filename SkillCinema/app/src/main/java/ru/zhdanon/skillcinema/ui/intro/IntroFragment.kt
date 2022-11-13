@@ -7,9 +7,11 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
+import dagger.hilt.android.AndroidEntryPoint
 import ru.zhdanon.skillcinema.R
 import ru.zhdanon.skillcinema.databinding.IntroFragmentBinding
 
+@AndroidEntryPoint
 class IntroFragment : Fragment() {
 
     private var _binding: IntroFragmentBinding? = null

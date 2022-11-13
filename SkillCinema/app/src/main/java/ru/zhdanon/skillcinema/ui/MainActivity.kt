@@ -4,12 +4,14 @@ import android.os.Bundle
 import android.preference.PreferenceManager
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.fragment.NavHostFragment
+import dagger.hilt.android.AndroidEntryPoint
 import ru.zhdanon.skillcinema.R
 import ru.zhdanon.skillcinema.databinding.ActivityMainBinding
 import ru.zhdanon.skillcinema.ui.intro.IntroFragment
 
 const val TAG = "ru.zhdanon.skillcinema.ui"
 
+@AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
 
