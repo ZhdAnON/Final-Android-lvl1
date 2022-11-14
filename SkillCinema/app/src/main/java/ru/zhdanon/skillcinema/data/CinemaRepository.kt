@@ -14,6 +14,7 @@ class CinemaRepository @Inject constructor() {
         .build()
         .create(KinopoiskApi::class.java)
 
+    // FragmentFilmDetail
     suspend fun getFilmById(filmId: Int) = retrofit.getCurrentFilm(filmId)
 
     suspend fun getActorsByFilmId(filmId: Int) = retrofit.getActors(filmId)
@@ -21,6 +22,12 @@ class CinemaRepository @Inject constructor() {
     suspend fun getGalleryByFilmId(filmId: Int, type: String, page: Int) =
         retrofit.getFilmImages(filmId, type, page)
 
+    suspend fun getSimilarByFilmId(filmId: Int) = retrofit.getSimilarFilms(filmId)
+
+    // FragmentStaffDetail
+    suspend fun getStaffById(staffId: Int) = retrofit.getStaff(staffId)
+
+    // FragmentSearch
     suspend fun getFilmsByFilter(
         countries: String = "",
         genres: String = "",

@@ -5,32 +5,47 @@
     android:layout_height="match_parent">
 
     <androidx.appcompat.widget.AppCompatImageView
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        android:src="@drawable/banner_app_name"
         android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_marginStart="26dp"
         android:layout_marginTop="80dp"
-        android:layout_height="wrap_content"
-        android:contentDescription="@string/app_name" />
+        android:contentDescription="@string/app_name"
+        android:src="@drawable/banner_app_name"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/btn_intro_skip"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="@color/white"
-        android:elevation="1dp"
         android:layout_marginTop="81.62dp"
         android:layout_marginEnd="26dp"
+        android:background="@color/white"
+        android:elevation="1dp"
         android:text="@string/intro_btn_skip"
         android:textColor="#656565"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <androidx.viewpager.widget.ViewPager
+    <androidx.viewpager2.widget.ViewPager2
         android:id="@+id/intro_viewpager"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" >
-    </androidx.viewpager.widget.ViewPager>
+        android:layout_height="match_parent" />
+
+    <com.google.android.material.tabs.TabLayout
+        android:id="@+id/tab"
+        android:layout_width="60dp"
+        android:layout_height="15dp"
+        android:layout_marginStart="26dp"
+        android:layout_marginEnd="26dp"
+        android:layout_marginBottom="50dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:tabBackground="@drawable/default_dot"
+        app:tabIndicator="@drawable/selected_dot"
+        app:tabIndicatorAnimationMode="elastic"
+        app:tabIndicatorColor="@color/black"
+        app:tabIndicatorHeight="16dp" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

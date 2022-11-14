@@ -9,7 +9,21 @@ fun main() {
     val repository = CinemaRepository()
     runBlocking {
         launch(Dispatchers.IO) {
-            val gallery = repository.getGalleryByFilmId(329, "SCREENSHOT",1)
+            val staff = repository.getStaffById(9144)
+
+            staff.apply {
+                println("1 - $personId | $webUrl | $nameRu | $nameEn | $sex")
+                println("2 - $posterUrl | $growth")
+                println("3 - $birthday | $death | $age | $birthPlace | $deathPlace")
+                println("4 - $hasAwards | $profession")
+                println("5 - ${facts.joinToString(" | ")}")
+                println("6 - ${spouses?.joinToString(" | ")}")
+                println("7 - ${films?.map { film -> film.nameRu }?.joinToString(" | ")}")
+            }
+        }
+    }
+}
+
 //            val film = listOf(
 //                repository.getFilmById(329),
 //                repository.getFilmById(4477075),
@@ -18,10 +32,3 @@ fun main() {
 //                repository.getFilmById(4639557),
 //                repository.getFilmById(1405508)
 //            )
-
-            gallery.items.forEach {
-                println(it.previewUrl)
-            }
-        }
-    }
-}

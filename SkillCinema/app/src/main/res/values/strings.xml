@@ -21,5 +21,9 @@
     <string name="label_film_makers">Над фильмом работали</string>
     <string name="label_film_gallery">Галерея</string>
     <string name="label_film_similar">Похожие фильмы</string>
-    <!-- -->
+
+    <!-- Staff detail fragment -->
+    <string name="staff_detail_filmography_label">Фильмография</string>
+    <string name="staff_detail_best_label">Лучшее</string>
+
 </resources>

@@ -4,49 +4,68 @@ import retrofit2.http.GET
 import retrofit2.http.Headers
 import retrofit2.http.Path
 import retrofit2.http.Query
-import ru.zhdanon.skillcinema.data.actorsbyfilmid.ResponseActorsByFilmId
+import ru.zhdanon.skillcinema.data.staffbyfilmid.ResponseStaffByFilmId
 import ru.zhdanon.skillcinema.data.filmbyfilter.ResponseByFilter
 import ru.zhdanon.skillcinema.data.filmbyid.ResponseCurrentFilm
 import ru.zhdanon.skillcinema.data.filmgallery.ResponseFilmGallery
 import ru.zhdanon.skillcinema.data.filmspremier.ResponsePremier
 import ru.zhdanon.skillcinema.data.filmstop.ResponseTop
+import ru.zhdanon.skillcinema.data.similarfilm.ResponseSimilarFilms
+import ru.zhdanon.skillcinema.data.staffbyid.ResponseStaffById
 
 interface KinopoiskApi {
-    @Headers("X-API-KEY: $API_KEY_2")
+
+    // FragmentFilmDetail
+    @Headers("X-API-KEY: $API_KEY")
     @GET("v2.2/films/{id}")
     suspend fun getCurrentFilm(
         @Path("id") id: Int
     ): ResponseCurrentFilm
 
-    @Headers("X-API-KEY: $API_KEY_2")
+    @Headers("X-API-KEY: $API_KEY")
     @GET("v1/staff")
     suspend fun getActors(
         @Query("filmId") filmId: Int
-    ): List<ResponseActorsByFilmId>
+    ): List<ResponseStaffByFilmId>
 
-    @Headers("X-API-KEY: $API_KEY_2")
+    @Headers("X-API-KEY: $API_KEY")
     @GET("v2.2/films/{id}/images")
     suspend fun getFilmImages(
         @Path("id") id: Int,
-        @Query("type") type: String = "SCREENSHOT",
+        @Query("type") type: String = "STILL",
         @Query("page") page: Int
     ): ResponseFilmGallery
 
-    @Headers("X-API-KEY: $API_KEY_2")
+    @Headers("X-API-KEY: $API_KEY")
+    @GET("v2.2/films/{id}/similars")
+    suspend fun getSimilarFilms(
+        @Path("id") id: Int
+    ): ResponseSimilarFilms
+
+    // FragmentStaffDetail
+    @Headers("X-API-KEY: $API_KEY")
+    @GET("v1/staff/{id}")
+    suspend fun getStaff(
+        @Path("id") id: Int
+    ): ResponseStaffById
+
+    // FragmentHome
+    @Headers("X-API-KEY: $API_KEY")
     @GET("v2.2/films/top")
     suspend fun getFilmsTop(
         @Query("type") type: String,
         @Query("page") page: Int
     ): ResponseTop
 
-    @Headers("X-API-KEY: $API_KEY_2")
+    @Headers("X-API-KEY: $API_KEY")
     @GET("v2.2/films/premieres")
     suspend fun getPremier(
         @Query("year") year: Int,
         @Query("month") month: String
     ): ResponsePremier
 
-    @Headers("X-API-KEY: $API_KEY_2")
+    // FragmentSearch
+    @Headers("X-API-KEY: $API_KEY")
     @GET("v2.2/films/")
     suspend fun getFilmsByFilter(
         @Query("countries") countries: String,
@@ -63,7 +82,8 @@ interface KinopoiskApi {
     ): ResponseByFilter
 
     companion object {
-        private const val API_KEY_2 = "ffcd0204-2065-4214-b6ae-aa29f5fe4003"
-//        private const val API_KEY_2 = "f746dfa5-8093-401b-8df2-e84042f3dc96"
+//        private const val API_KEY = "ffcd0204-2065-4214-b6ae-aa29f5fe4003"
+//        private const val API_KEY = "f746dfa5-8093-401b-8df2-e84042f3dc96"
+        private const val API_KEY = "00ec3c68-8c85-4bd5-8508-024db2f99a4c"
     }
 }

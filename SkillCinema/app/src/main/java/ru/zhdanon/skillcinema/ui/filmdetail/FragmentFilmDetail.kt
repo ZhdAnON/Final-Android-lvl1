@@ -5,7 +5,6 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -20,26 +19,27 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import ru.zhdanon.skillcinema.R
 import ru.zhdanon.skillcinema.app.loadImage
-import ru.zhdanon.skillcinema.data.actorsbyfilmid.ResponseActorsByFilmId
 import ru.zhdanon.skillcinema.data.filmbyid.ResponseCurrentFilm
-import ru.zhdanon.skillcinema.data.filmgallery.ItemImageGallery
+import ru.zhdanon.skillcinema.data.staffbyfilmid.ResponseStaffByFilmId
 import ru.zhdanon.skillcinema.databinding.FragmentFilmDetailBinding
 import ru.zhdanon.skillcinema.ui.CinemaViewModel
 import ru.zhdanon.skillcinema.ui.StateLoading
 import ru.zhdanon.skillcinema.ui.TAG
 import ru.zhdanon.skillcinema.ui.allfilmsbycategory.FragmentAllFilms
-import ru.zhdanon.skillcinema.ui.filmdetail.actorsadapter.ActorsAdapter
 import ru.zhdanon.skillcinema.ui.filmdetail.galleryadapter.GalleryAdapter
+import ru.zhdanon.skillcinema.ui.filmdetail.staffadapter.StaffAdapter
 import ru.zhdanon.skillcinema.ui.home.FragmentHome
+import ru.zhdanon.skillcinema.ui.home.filmrecycler.FilmAdapter
 
 class FragmentFilmDetail : Fragment() {
     private var _binding: FragmentFilmDetailBinding? = null
     private val binding get() = _binding!!
 
     private val viewModel: CinemaViewModel by activityViewModels()
-    private lateinit var actorAdapter: ActorsAdapter
-    private lateinit var makersAdapter: ActorsAdapter
+    private lateinit var actorAdapter: StaffAdapter
+    private lateinit var makersAdapter: StaffAdapter
     private lateinit var galleryAdapter: GalleryAdapter
+    private lateinit var similarAdapter: FilmAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -55,16 +55,26 @@ class FragmentFilmDetail : Fragment() {
 
         val navArg: FragmentFilmDetailArgs by navArgs()
 
-        stateLoadingListener()
+        stateLoadingListener()              // Установка слушателя состояния загрузки
 
-        setFilmDetails()
-        setFilmActors()
-        setFilmMakers()
-        setFilmGallery()
+        setFilmDetails()                    // Установка постера, инфорации на нём и описания фильма
+        setFilmActors()                     // Установка списка актёров
+        setFilmMakers()                     // Установка списка съёмочной группы
+        setFilmGallery()                    // Установка галереи фотографий
+        setSimilarFilms()                   // Установка списка похожих фильмов
 
+        setButtonBackClick(navArg.keyNav)   // Установка навигации стрелкой "назад"
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
+
+    private fun setButtonBackClick(navKey: String) {
         binding.btnBack.setOnClickListener {
-            Log.d(TAG, "onViewCreated: ${navArg.keyNav}")
-            when (navArg.keyNav) {
+            Log.d(TAG, "onViewCreated: $navKey")
+            when (navKey) {
                 FragmentHome.KEY_NAV_FRAGMENT_HOME ->
                     findNavController().navigate(
                         resId = R.id.fragmentHome,
@@ -81,13 +91,15 @@ class FragmentFilmDetail : Fragment() {
                             .setPopUpTo(R.id.fragmentAllFilms, true)
                             .build()
                     )
+                else -> findNavController().navigate(
+                    resId = R.id.fragmentHome,
+                    args = null,
+                    navOptions = NavOptions.Builder()
+                        .setPopUpTo(R.id.fragmentHome, true)
+                        .build()
+                )
             }
         }
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
     }
 
     private fun stateLoadingListener() {
@@ -139,7 +151,7 @@ class FragmentFilmDetail : Fragment() {
     }
 
     private fun setFilmActors() {
-        actorAdapter = ActorsAdapter { onActorClick(it) }
+        actorAdapter = StaffAdapter { onActorClick(it) }
         binding.filmActorsList.layoutManager =
             GridLayoutManager(
                 requireContext(),
@@ -150,15 +162,11 @@ class FragmentFilmDetail : Fragment() {
         binding.filmActorsList.adapter = actorAdapter
         viewLifecycleOwner.lifecycleScope.launch {
             viewModel.currentFilmActors.collect { actorList ->
+                binding.filmActorsCount.text = actorList.size.toString()
                 if (actorList.size < MAX_ACTORS_COLUMN * MAX_ACTORS_ROWS) {
-                    binding.filmActorsBtn.isVisible = false
-                    binding.filmActorsCount.isVisible = false
                     actorAdapter.submitList(actorList)
                 } else {
-                    binding.filmActorsBtn.isVisible = true
-                    binding.filmActorsCount.isVisible = true
-                    binding.filmActorsCount.text = actorList.size.toString()
-                    val actorsListTemp = mutableListOf<ResponseActorsByFilmId>()
+                    val actorsListTemp = mutableListOf<ResponseStaffByFilmId>()
                     repeat(MAX_ACTORS_COLUMN * MAX_ACTORS_ROWS) { actorsListTemp.add(actorList[it]) }
                     actorAdapter.submitList(actorsListTemp)
                 }
@@ -167,7 +175,7 @@ class FragmentFilmDetail : Fragment() {
     }
 
     private fun setFilmMakers() {
-        makersAdapter = ActorsAdapter { onActorClick(it) }
+        makersAdapter = StaffAdapter { onActorClick(it) }
         binding.filmMakersList.layoutManager =
             GridLayoutManager(
                 requireContext(),
@@ -187,7 +195,7 @@ class FragmentFilmDetail : Fragment() {
                     binding.filmMakersCount.isVisible = true
                     binding.filmMakersBtn.isVisible = true
                     binding.filmMakersCount.text = makersList.size.toString()
-                    val makersListTemp = mutableListOf<ResponseActorsByFilmId>()
+                    val makersListTemp = mutableListOf<ResponseStaffByFilmId>()
                     repeat(MAX_MAKERS_COLUMN * MAX_MAKERS_ROWS) { makersListTemp.add(makersList[it]) }
                     makersAdapter.submitList(makersListTemp)
                 }
@@ -201,31 +209,34 @@ class FragmentFilmDetail : Fragment() {
             LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
         binding.filmGalleryList.adapter = galleryAdapter
         viewLifecycleOwner.lifecycleScope.launch {
-            viewModel.currentFilmGallery.collect { imageList ->
-                if (imageList.size <= MAX_GALLERY_SIZE) {
-                    binding.filmGalleryCount.isVisible = false
-                    binding.filmGalleryBtn.isVisible = false
-                    galleryAdapter.submitList(imageList)
-                } else {
-                    binding.filmGalleryBtn.isVisible = true
-                    binding.filmGalleryCount.isVisible = true
-                    binding.filmGalleryCount.text = imageList.size.toString()
-                    val tempGallery = mutableListOf<ItemImageGallery>()
-                    repeat(MAX_GALLERY_SIZE) {
-                        tempGallery.add(imageList[it])
-                    }
-                    galleryAdapter.submitList(tempGallery)
-                }
+            viewModel.currentFilmGallery.collect { responseGallery ->
+                binding.filmGalleryCount.text = responseGallery.total.toString()
+                galleryAdapter.submitList(responseGallery.items)
             }
         }
     }
 
-    private fun onActorClick(actor: ResponseActorsByFilmId) {
-        Toast.makeText(
-            requireContext(),
-            actor.nameRu ?: actor.nameEn ?: "Unknown name",
-            Toast.LENGTH_SHORT
-        ).show()
+    private fun setSimilarFilms() {
+        similarAdapter = FilmAdapter(20, { }, { onSimilarFilmClick(it) })
+        binding.filmSimilarList.layoutManager =
+            LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
+        binding.filmSimilarList.adapter = similarAdapter
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.currentFilmSimilar.collect {
+                binding.filmSimilarCount.text = it.size.toString()
+                similarAdapter.submitList(it)
+            }
+        }
+    }
+
+    private fun onActorClick(staff: ResponseStaffByFilmId) {
+        val action =
+            FragmentFilmDetailDirections.actionFragmentFilmDetailToFragmentStaffDetail(staff.staffId)
+        findNavController().navigate(action)
+    }
+
+    private fun onSimilarFilmClick(filmId: Int) {
+        viewModel.getFilmById(filmId)
     }
 
     companion object {
@@ -233,7 +244,6 @@ class FragmentFilmDetail : Fragment() {
         private const val MAX_ACTORS_ROWS = 4
         private const val MAX_MAKERS_COLUMN = 3
         private const val MAX_MAKERS_ROWS = 2
-        private const val MAX_GALLERY_SIZE = 20
 
         private fun getRatingName(film: ResponseCurrentFilm): String {
             val result = mutableListOf<String>()

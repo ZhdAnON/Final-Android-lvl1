@@ -14,9 +14,10 @@ import ru.zhdanon.skillcinema.app.converterInMonth
 import ru.zhdanon.skillcinema.app.prepareToShow
 import ru.zhdanon.skillcinema.data.CategoriesFilms
 import ru.zhdanon.skillcinema.data.TOP_TYPES
-import ru.zhdanon.skillcinema.data.actorsbyfilmid.ResponseActorsByFilmId
 import ru.zhdanon.skillcinema.data.filmbyid.ResponseCurrentFilm
-import ru.zhdanon.skillcinema.data.filmgallery.ItemImageGallery
+import ru.zhdanon.skillcinema.data.filmgallery.ResponseFilmGallery
+import ru.zhdanon.skillcinema.data.similarfilm.SimilarItem
+import ru.zhdanon.skillcinema.data.staffbyfilmid.ResponseStaffByFilmId
 import ru.zhdanon.skillcinema.domain.*
 import ru.zhdanon.skillcinema.entity.HomeItem
 import ru.zhdanon.skillcinema.ui.allfilmsbycategory.allfilmadapter.AllFilmAdapter
@@ -30,7 +31,8 @@ class CinemaViewModel @Inject constructor(
     private val getPremierFilmUseCase: GetPremierFilmUseCase,
     private val getFilmByIdUseCase: GetFilmByIdUseCase,
     private val getActorsByFilmIdUseCase: GetActorsListUseCase,
-    private val getGalleryByIdUseCase: GetGalleryByIdUseCase
+    private val getGalleryByIdUseCase: GetGalleryByIdUseCase,
+    private val getSimilarFilmsUseCase: GetSimilarFilmsUseCase
 ) : ViewModel() {
     private val calendar = Calendar.getInstance()
 
@@ -43,7 +45,7 @@ class CinemaViewModel @Inject constructor(
     val loadCategoryState = _loadCategoryState.asStateFlow()
 
     // FragmentAllFilms
-    private var allFilmAdapter: AllFilmAdapter = AllFilmAdapter {  }
+    private var allFilmAdapter: AllFilmAdapter = AllFilmAdapter { }
     private lateinit var currentCategory: CategoriesFilms
 
     val allFilmsByCategory: Flow<PagingData<HomeItem>> = Pager(
@@ -60,17 +62,19 @@ class CinemaViewModel @Inject constructor(
 
     // FragmentFilmDetail
     private val _currentFilm = MutableSharedFlow<ResponseCurrentFilm>()
-
     val currentFilm = _currentFilm.asSharedFlow()
-    private val _currentFilmActors = MutableStateFlow<List<ResponseActorsByFilmId>>(emptyList())
 
+    private val _currentFilmActors = MutableStateFlow<List<ResponseStaffByFilmId>>(emptyList())
     val currentFilmActors = _currentFilmActors.asStateFlow()
-    private val _currentFilmMakers = MutableStateFlow<List<ResponseActorsByFilmId>>(emptyList())
 
+    private val _currentFilmMakers = MutableStateFlow<List<ResponseStaffByFilmId>>(emptyList())
     val currentFilmMakers = _currentFilmMakers.asStateFlow()
-    private val _currentFilmGallery = MutableStateFlow<List<ItemImageGallery>>(emptyList())
 
-    val currentFilmGallery = _currentFilmGallery.asStateFlow()
+    private val _currentFilmGallery = MutableSharedFlow<ResponseFilmGallery>()
+    val currentFilmGallery = _currentFilmGallery.asSharedFlow()
+
+    private val _currentFilmSimilar = MutableStateFlow<List<SimilarItem>>(emptyList())
+    val currentFilmSimilar = _currentFilmSimilar.asStateFlow()
 
     private val _loadCurrentFilmState = MutableStateFlow<StateLoading>(StateLoading.Default)
     val loadCurrentFilmState = _loadCurrentFilmState.asStateFlow()
@@ -127,6 +131,7 @@ class CinemaViewModel @Inject constructor(
         currentCategory = category
         if (allFilmAdapter.itemCount != 0) allFilmAdapter.refresh()
     }
+
     fun getCurrentCategory() = currentCategory
 
     fun getAllFilmAdapter() = allFilmAdapter
@@ -141,9 +146,12 @@ class CinemaViewModel @Inject constructor(
                 val tempFilm = getFilmByIdUseCase.executeFilmById(filmId)
                 _currentFilm.emit(tempFilm)
                 val tempActorList = getActorsByFilmIdUseCase.executeActorsList(filmId)
-                _currentFilmGallery.value = getGalleryByIdUseCase
-                    .executeGalleryByFilmId(filmId, "SCREENSHOT", 1).items
+                _currentFilmGallery.emit(
+                    getGalleryByIdUseCase.executeGalleryByFilmId(filmId, "STILL", 1)
+                )
                 sortingActorsAndMakers(tempActorList)
+                val responseSimilar = getSimilarFilmsUseCase.executeSimilarFilms(filmId)
+                if (responseSimilar.total != 0) _currentFilmSimilar.value = responseSimilar.items!!
                 _loadCurrentFilmState.value = StateLoading.Success
             } catch (e: Throwable) {
                 _loadCurrentFilmState.value = StateLoading.Error(e.message.toString())
@@ -151,9 +159,9 @@ class CinemaViewModel @Inject constructor(
         }
     }
 
-    private fun sortingActorsAndMakers(actorsList: List<ResponseActorsByFilmId>) {
-        val actors = mutableListOf<ResponseActorsByFilmId>()
-        val makers = mutableListOf<ResponseActorsByFilmId>()
+    private fun sortingActorsAndMakers(actorsList: List<ResponseStaffByFilmId>) {
+        val actors = mutableListOf<ResponseStaffByFilmId>()
+        val makers = mutableListOf<ResponseStaffByFilmId>()
         actorsList.forEach {
             if (it.professionKey == "ACTOR") actors.add(it)
             else makers.add(it)

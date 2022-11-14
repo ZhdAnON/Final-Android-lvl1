@@ -20,7 +20,8 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val navHost = supportFragmentManager.findFragmentById(R.id.main_container) as NavHostFragment
+        val navHost =
+            supportFragmentManager.findFragmentById(R.id.main_container) as NavHostFragment
         val navController = navHost.navController
 
         PreferenceManager.getDefaultSharedPreferences(this).apply {

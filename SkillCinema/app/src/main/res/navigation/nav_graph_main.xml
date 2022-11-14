@@ -35,6 +35,11 @@
             android:name="keyNav"
             app:argType="string"
             android:defaultValue="FRAGMENT_HOME" />
+        <action
+            app:popUpTo="@id/fragmentFilmDetail"
+            app:popUpToInclusive="true"
+            android:id="@+id/action_fragmentFilmDetail_to_fragmentStaffDetail"
+            app:destination="@id/fragmentStaffDetail" />
     </fragment>
     <fragment
         tools:layout="@layout/fragment_all_films"
@@ -44,6 +49,19 @@
         <action
             app:popUpTo="@id/fragmentAllFilms"
             android:id="@+id/action_fragmentAllFilms_to_fragmentFilmDetail"
+            app:destination="@id/fragmentFilmDetail" />
+    </fragment>
+    <fragment
+        tools:layout="@layout/fragment_staff_detail"
+        android:id="@+id/fragmentStaffDetail"
+        android:name="ru.zhdanon.skillcinema.ui.staffdetail.FragmentStaffDetail"
+        android:label="FragmentStaffDetail" >
+        <argument
+            android:name="staffId"
+            app:argType="integer" />
+        <action
+            app:popUpTo="@id/fragmentStaffDetail"
+            android:id="@+id/action_fragmentStaffDetail_to_fragmentFilmDetail"
             app:destination="@id/fragmentFilmDetail" />
     </fragment>
 </navigation>
