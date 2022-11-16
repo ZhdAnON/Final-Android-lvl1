@@ -212,7 +212,7 @@ class FragmentFilmDetail : Fragment() {
 
     // Похожие фильмы
     private fun setSimilarFilms() {
-        similarAdapter = FilmAdapter(20, { }, { onSimilarFilmClick(it) })
+        similarAdapter = FilmAdapter(20, { showAllSimilarFilms() }, { onSimilarFilmClick(it) })
         binding.filmSimilarList.layoutManager =
             LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
         binding.filmSimilarList.adapter = similarAdapter
@@ -222,10 +222,13 @@ class FragmentFilmDetail : Fragment() {
                 similarAdapter.submitList(it)
             }
         }
+        binding.filmSimilarBtn.setOnClickListener { showAllSimilarFilms() }
     }
 
-    private fun onSimilarFilmClick(filmId: Int) {
-        viewModel.getFilmById(filmId)
+    private fun onSimilarFilmClick(filmId: Int) { viewModel.getFilmById(filmId) }
+
+    private fun showAllSimilarFilms() {
+        findNavController().navigate(R.id.action_fragmentFilmDetail_to_fragmentSimilarFilms)
     }
 
     companion object {

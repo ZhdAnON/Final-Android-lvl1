@@ -48,6 +48,9 @@
             app:popUpTo="@id/fragmentFilmDetail"
             android:id="@+id/action_fragmentFilmDetail_to_fragmentAllStaffsByFilm"
             app:destination="@id/fragmentAllStaffsByFilm" />
+        <action
+            android:id="@+id/action_fragmentFilmDetail_to_fragmentSimilarFilms"
+            app:destination="@id/fragmentSimilarFilms" />
     </fragment>
     <fragment
         tools:layout="@layout/fragment_all_films"
@@ -98,5 +101,13 @@
         <action
             android:id="@+id/action_fragmentAllStaffsByFilm_to_fragmentStaffDetail"
             app:destination="@id/fragmentStaffDetail" />
+    </fragment>
+    <fragment
+        android:id="@+id/fragmentSimilarFilms"
+        android:name="ru.zhdanon.skillcinema.ui.filmdetailsimilar.FragmentSimilarFilms"
+        android:label="FragmentSimilarFilms" >
+        <action
+            android:id="@+id/action_fragmentSimilarFilms_to_fragmentFilmDetail"
+            app:destination="@id/fragmentFilmDetail" />
     </fragment>
 </navigation>

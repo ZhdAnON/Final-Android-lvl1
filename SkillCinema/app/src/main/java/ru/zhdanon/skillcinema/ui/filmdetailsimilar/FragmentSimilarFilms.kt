@@ -1,4 +1,4 @@
-package ru.zhdanon.skillcinema.ui.allfilmsbycategory
+package ru.zhdanon.skillcinema.ui.filmdetailsimilar
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -12,13 +12,14 @@ import androidx.recyclerview.widget.GridLayoutManager
 import ru.zhdanon.skillcinema.R
 import ru.zhdanon.skillcinema.databinding.FragmentAllFilmsBinding
 import ru.zhdanon.skillcinema.ui.CinemaViewModel
-import ru.zhdanon.skillcinema.ui.allfilmsbycategory.allfilmadapter.AllFilmAdapter
+import ru.zhdanon.skillcinema.ui.home.filmrecycler.FilmAdapter
 
-class FragmentAllFilms : Fragment() {
+class FragmentSimilarFilms : Fragment() {
     private var _binding: FragmentAllFilmsBinding? = null
     private val binding get() = _binding!!
 
     private val viewModel: CinemaViewModel by activityViewModels()
+    private lateinit var adapter: FilmAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
@@ -30,7 +31,7 @@ class FragmentAllFilms : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        binding.allFilmsCategoryTv.text = viewModel.getCurrentCategory().text
+        binding.allFilmsCategoryTv.text = resources.getString(R.string.label_film_similar)
         binding.allFilmsToHomeBtn.setOnClickListener { requireActivity().onBackPressed() }
 
         setAdapter()                // Установка адаптера
@@ -38,24 +39,23 @@ class FragmentAllFilms : Fragment() {
     }
 
     private fun setAdapter() {
-        viewModel.setAllFilmAdapter(AllFilmAdapter { onClickFilm(it) })
-
+        adapter = FilmAdapter(20, {}) { onClickFilm(it) }
         binding.allFilmsList.layoutManager =
             GridLayoutManager(requireContext(), 2, GridLayoutManager.VERTICAL, false)
-        binding.allFilmsList.adapter = viewModel.getAllFilmAdapter()
+        binding.allFilmsList.adapter = adapter
     }
 
     private fun setFilmList() {
         viewLifecycleOwner.lifecycleScope.launchWhenStarted {
-            viewModel.allFilmsByCategory.collect {
-                viewModel.getAllFilmAdapter().submitData(it)
+            viewModel.currentFilmSimilar.collect {
+                adapter.submitList(it)
             }
         }
     }
 
     private fun onClickFilm(filmId: Int) {
         viewModel.getFilmById(filmId)
-        findNavController().navigate(R.id.action_fragmentAllFilms_to_fragmentFilmDetail)
+        findNavController().navigate(R.id.action_fragmentSimilarFilms_to_fragmentFilmDetail)
     }
 
     override fun onDestroyView() {
