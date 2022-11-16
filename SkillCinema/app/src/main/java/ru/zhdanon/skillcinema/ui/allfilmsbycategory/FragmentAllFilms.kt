@@ -10,8 +10,6 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavOptions
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
 import ru.zhdanon.skillcinema.R
 import ru.zhdanon.skillcinema.databinding.FragmentAllFilmsBinding
 import ru.zhdanon.skillcinema.ui.CinemaViewModel
@@ -40,9 +38,11 @@ class FragmentAllFilms : Fragment() {
             GridLayoutManager(requireContext(), 2, GridLayoutManager.VERTICAL, false)
         binding.allFilmsList.adapter = viewModel.getAllFilmAdapter()
 
-        viewModel.allFilmsByCategory.onEach {
-            viewModel.getAllFilmAdapter().submitData(it)
-        }.launchIn(viewLifecycleOwner.lifecycleScope)
+        viewLifecycleOwner.lifecycleScope.launchWhenStarted {
+            viewModel.allFilmsByCategory.collect {
+                viewModel.getAllFilmAdapter().submitData(it)
+            }
+        }
 
         binding.allFilmsToHomeBtn.setOnClickListener {
             findNavController().navigate(

@@ -9,8 +9,7 @@ import ru.zhdanon.skillcinema.entity.HomeItem
 
 class AllFilmAdapter(
     private val onClick: (Int) -> Unit
-) :
-    PagingDataAdapter<HomeItem, AllFilmViewHolder>(DiffUtilAllFilms()) {
+) : PagingDataAdapter<HomeItem, AllFilmViewHolder>(AllFilmsDiffUtil()) {
     override fun onBindViewHolder(holder: AllFilmViewHolder, position: Int) {
         val item = getItem(position)
         with(holder.binding) {

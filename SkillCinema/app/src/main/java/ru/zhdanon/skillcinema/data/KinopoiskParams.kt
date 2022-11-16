@@ -20,3 +20,15 @@ enum class Month(val count: Int) {
     NOVEMBER(11),
     DECEMBER(12)
 }
+
+val GALLERY_TYPES = mapOf(
+    "STILL" to "кадры",
+    "SHOOTING" to "со съемок",
+    "POSTER" to "постеры",
+    "FAN_ART" to "фан-арты",
+    "PROMO" to "промо",
+    "CONCEPT" to "концепт-арты",
+    "WALLPAPER" to "обои",
+    "COVER" to "обложки",
+    "SCREENSHOT" to "скриншоты"
+)

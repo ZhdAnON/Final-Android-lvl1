@@ -9,8 +9,7 @@ class GalleryViewHolder(
     private val binding: ItemGalleryFilmDetailBinding
 ) : RecyclerView.ViewHolder(binding.root) {
 
-    fun bindItem(item: ItemImageGallery, clickImage: (image: ItemImageGallery) -> Unit) {
+    fun bindItem(item: ItemImageGallery) {
         binding.galleryImageFilmDetail.loadImage(item.previewUrl)
-        binding.root.setOnClickListener { clickImage(item) }
     }
 }

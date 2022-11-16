@@ -40,6 +40,10 @@
             app:popUpToInclusive="true"
             android:id="@+id/action_fragmentFilmDetail_to_fragmentStaffDetail"
             app:destination="@id/fragmentStaffDetail" />
+        <action
+            app:popUpTo="@id/fragmentFilmDetail"
+            android:id="@+id/action_fragmentFilmDetail_to_fragmentGallery"
+            app:destination="@id/fragmentGallery" />
     </fragment>
     <fragment
         tools:layout="@layout/fragment_all_films"
@@ -64,4 +68,23 @@
             android:id="@+id/action_fragmentStaffDetail_to_fragmentFilmDetail"
             app:destination="@id/fragmentFilmDetail" />
     </fragment>
+    <fragment
+        android:id="@+id/fragmentGallery"
+        tools:layout="@layout/fragment_film_gallery"
+        android:name="ru.zhdanon.skillcinema.ui.gallery.FragmentGalleryFull"
+        android:label="FragmentGallery" >
+        <action
+            app:popUpTo="@id/fragmentFilmDetail"
+            android:id="@+id/action_fragmentGallery_to_fragmentFilmDetail"
+            app:destination="@id/fragmentFilmDetail" />
+        <action
+            app:popUpTo="@id/fragmentGallery"
+            android:id="@+id/action_fragmentGallery_to_fragmentGalleryFullscreen"
+            app:destination="@id/fragmentGalleryFullscreen" />
+    </fragment>
+    <fragment
+        tools:layout="@layout/item_gallery_image"
+        android:id="@+id/fragmentGalleryFullscreen"
+        android:name="ru.zhdanon.skillcinema.ui.gallery.FragmentGalleryFullscreen"
+        android:label="FragmentGalleryFullscreen" />
 </navigation>

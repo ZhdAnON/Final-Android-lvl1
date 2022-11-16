@@ -4,7 +4,7 @@ import android.annotation.SuppressLint
 import androidx.recyclerview.widget.DiffUtil
 import ru.zhdanon.skillcinema.entity.HomeItem
 
-class DiffUtilAllFilms : DiffUtil.ItemCallback<HomeItem>() {
+class AllFilmsDiffUtil : DiffUtil.ItemCallback<HomeItem>() {
     override fun areItemsTheSame(
         oldItem: HomeItem,
         newItem: HomeItem

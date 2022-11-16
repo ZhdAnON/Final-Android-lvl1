@@ -1,21 +1,20 @@
 package ru.zhdanon.skillcinema.ui.filmdetail
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavOptions
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import ru.zhdanon.skillcinema.R
 import ru.zhdanon.skillcinema.app.loadImage
@@ -24,7 +23,6 @@ import ru.zhdanon.skillcinema.data.staffbyfilmid.ResponseStaffByFilmId
 import ru.zhdanon.skillcinema.databinding.FragmentFilmDetailBinding
 import ru.zhdanon.skillcinema.ui.CinemaViewModel
 import ru.zhdanon.skillcinema.ui.StateLoading
-import ru.zhdanon.skillcinema.ui.TAG
 import ru.zhdanon.skillcinema.ui.allfilmsbycategory.FragmentAllFilms
 import ru.zhdanon.skillcinema.ui.filmdetail.galleryadapter.GalleryAdapter
 import ru.zhdanon.skillcinema.ui.filmdetail.staffadapter.StaffAdapter
@@ -73,7 +71,6 @@ class FragmentFilmDetail : Fragment() {
 
     private fun setButtonBackClick(navKey: String) {
         binding.btnBack.setOnClickListener {
-            Log.d(TAG, "onViewCreated: $navKey")
             when (navKey) {
                 FragmentHome.KEY_NAV_FRAGMENT_HOME ->
                     findNavController().navigate(
@@ -103,64 +100,71 @@ class FragmentFilmDetail : Fragment() {
     }
 
     private fun stateLoadingListener() {
-        viewModel.loadCurrentFilmState.onEach { state ->
-            when (state) {
-                is StateLoading.Loading -> {
-                    binding.apply {
-                        progressGroup.isVisible = true
-                        loadingProgress.isVisible = true
-                        loadingRefreshBtn.isVisible = false
-                        filmMainGroup.isVisible = false
-                        filmDescriptionGroup.isVisible = false
+        viewLifecycleOwner.lifecycleScope.launchWhenStarted {
+            viewModel.loadCurrentFilmState.collect { state ->
+                when (state) {
+                    is StateLoading.Loading -> {
+                        binding.apply {
+                            progressGroup.isVisible = true
+                            loadingProgress.isVisible = true
+                            loadingRefreshBtn.isVisible = false
+                            filmMainGroup.isVisible = false
+                            filmDescriptionGroup.isVisible = false
+                        }
                     }
-                }
-                is StateLoading.Success -> {
-                    binding.apply {
-                        progressGroup.isVisible = false
-                        filmMainGroup.isVisible = true
-                        filmDescriptionGroup.isVisible = true
+                    is StateLoading.Success -> {
+                        binding.apply {
+                            progressGroup.isVisible = false
+                            filmMainGroup.isVisible = true
+                            filmDescriptionGroup.isVisible = true
+                        }
                     }
-                }
-                else -> {
-                    binding.apply {
-                        progressGroup.isVisible = true
-                        loadingProgress.isVisible = false
-                        loadingRefreshBtn.isVisible = true
-                        filmMainGroup.isVisible = false
-                        filmDescriptionGroup.isVisible = false
+                    else -> {
+                        binding.apply {
+                            progressGroup.isVisible = true
+                            loadingProgress.isVisible = false
+                            loadingRefreshBtn.isVisible = true
+                            filmMainGroup.isVisible = false
+                            filmDescriptionGroup.isVisible = false
+                        }
                     }
-                }
-            }
-        }.launchIn(viewLifecycleOwner.lifecycleScope)
-    }
-
-    private fun setFilmDetails() {
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewModel.currentFilm.collect { film ->
-                binding.apply {
-                    filmName.text = getName(film)
-                    filmPoster.loadImage(film.posterUrl)
-                    filmDescriptionShort.text = film.shortDescription
-                    filmDescriptionFull.text = film.description
-                    filmRatingNameTv.text = getRatingName(film)
-                    filmYearGenresTv.text = getYearGenres(film)
-                    filmCountryLengthAgeLimitTv.text = getStrCountriesLengthAge(film)
                 }
             }
         }
     }
 
+    // Информация о фильме
+    private fun setFilmDetails() {
+        viewLifecycleOwner.lifecycleScope.launchWhenStarted {
+            lifecycleScope.launch {
+                lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                    viewModel.currentFilm.collect { film ->
+                        if (film != null) {
+                            binding.apply {
+                                filmName.text = getName(film)
+                                filmPoster.loadImage(film.posterUrl)
+                                filmDescriptionShort.text = film.shortDescription
+                                filmDescriptionFull.text = film.description
+                                filmRatingNameTv.text = getRatingName(film)
+                                filmYearGenresTv.text = getYearGenres(film)
+                                filmCountryLengthAgeLimitTv.text = getStrCountriesLengthAge(film)
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    // Список актёров и съёмочной группы
     private fun setFilmActors() {
-        actorAdapter = StaffAdapter { onActorClick(it) }
+        actorAdapter = StaffAdapter { onStaffClick(it) }
         binding.filmActorsList.layoutManager =
             GridLayoutManager(
-                requireContext(),
-                MAX_ACTORS_ROWS,
-                GridLayoutManager.HORIZONTAL,
-                false
+                requireContext(), MAX_ACTORS_ROWS, GridLayoutManager.HORIZONTAL, false
             )
         binding.filmActorsList.adapter = actorAdapter
-        viewLifecycleOwner.lifecycleScope.launch {
+        viewLifecycleOwner.lifecycleScope.launchWhenStarted {
             viewModel.currentFilmActors.collect { actorList ->
                 binding.filmActorsCount.text = actorList.size.toString()
                 if (actorList.size < MAX_ACTORS_COLUMN * MAX_ACTORS_ROWS) {
@@ -175,7 +179,7 @@ class FragmentFilmDetail : Fragment() {
     }
 
     private fun setFilmMakers() {
-        makersAdapter = StaffAdapter { onActorClick(it) }
+        makersAdapter = StaffAdapter { onStaffClick(it) }
         binding.filmMakersList.layoutManager =
             GridLayoutManager(
                 requireContext(),
@@ -185,7 +189,7 @@ class FragmentFilmDetail : Fragment() {
             )
         binding.filmMakersList.adapter = makersAdapter
 
-        viewLifecycleOwner.lifecycleScope.launch {
+        viewLifecycleOwner.lifecycleScope.launchWhenStarted {
             viewModel.currentFilmMakers.collect { makersList ->
                 if (makersList.size < MAX_MAKERS_COLUMN * MAX_MAKERS_ROWS) {
                     binding.filmMakersCount.isVisible = false
@@ -203,36 +207,47 @@ class FragmentFilmDetail : Fragment() {
         }
     }
 
+    private fun onStaffClick(staff: ResponseStaffByFilmId) {
+        val action =
+            FragmentFilmDetailDirections.actionFragmentFilmDetailToFragmentStaffDetail(staff.staffId)
+        findNavController().navigate(action)
+    }
+
+    // Галерея фильма
     private fun setFilmGallery() {
-        galleryAdapter = GalleryAdapter { }
+        binding.filmGalleryBtn.setOnClickListener {
+            findNavController().navigate(R.id.action_fragmentFilmDetail_to_fragmentGallery)
+        }
+
+        galleryAdapter = GalleryAdapter()
         binding.filmGalleryList.layoutManager =
             LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
         binding.filmGalleryList.adapter = galleryAdapter
-        viewLifecycleOwner.lifecycleScope.launch {
+
+        viewLifecycleOwner.lifecycleScope.launchWhenStarted {
             viewModel.currentFilmGallery.collect { responseGallery ->
-                binding.filmGalleryCount.text = responseGallery.total.toString()
-                galleryAdapter.submitList(responseGallery.items)
+                galleryAdapter.submitList(responseGallery)
+            }
+        }
+        viewLifecycleOwner.lifecycleScope.launchWhenStarted {
+            viewModel.galleryCount.collect {
+                binding.filmGalleryCount.text = it.toString()
             }
         }
     }
 
+    // Похожие фильмы
     private fun setSimilarFilms() {
         similarAdapter = FilmAdapter(20, { }, { onSimilarFilmClick(it) })
         binding.filmSimilarList.layoutManager =
             LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
         binding.filmSimilarList.adapter = similarAdapter
-        viewLifecycleOwner.lifecycleScope.launch {
+        viewLifecycleOwner.lifecycleScope.launchWhenStarted {
             viewModel.currentFilmSimilar.collect {
                 binding.filmSimilarCount.text = it.size.toString()
                 similarAdapter.submitList(it)
             }
         }
-    }
-
-    private fun onActorClick(staff: ResponseStaffByFilmId) {
-        val action =
-            FragmentFilmDetailDirections.actionFragmentFilmDetailToFragmentStaffDetail(staff.staffId)
-        findNavController().navigate(action)
     }
 
     private fun onSimilarFilmClick(filmId: Int) {

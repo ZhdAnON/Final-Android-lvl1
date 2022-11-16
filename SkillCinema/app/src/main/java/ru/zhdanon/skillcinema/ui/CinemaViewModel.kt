@@ -8,20 +8,24 @@ import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import ru.zhdanon.skillcinema.app.converterInMonth
 import ru.zhdanon.skillcinema.app.prepareToShow
 import ru.zhdanon.skillcinema.data.CategoriesFilms
+import ru.zhdanon.skillcinema.data.GALLERY_TYPES
 import ru.zhdanon.skillcinema.data.TOP_TYPES
 import ru.zhdanon.skillcinema.data.filmbyid.ResponseCurrentFilm
-import ru.zhdanon.skillcinema.data.filmgallery.ResponseFilmGallery
+import ru.zhdanon.skillcinema.data.filmgallery.ItemImageGallery
 import ru.zhdanon.skillcinema.data.similarfilm.SimilarItem
 import ru.zhdanon.skillcinema.data.staffbyfilmid.ResponseStaffByFilmId
 import ru.zhdanon.skillcinema.domain.*
 import ru.zhdanon.skillcinema.entity.HomeItem
 import ru.zhdanon.skillcinema.ui.allfilmsbycategory.allfilmadapter.AllFilmAdapter
 import ru.zhdanon.skillcinema.ui.allfilmsbycategory.allfilmadapter.AllFilmPagingSource
+import ru.zhdanon.skillcinema.ui.gallery.recycleradapter.GalleryFullPagingSource
 import java.util.*
 import javax.inject.Inject
 
@@ -35,6 +39,8 @@ class CinemaViewModel @Inject constructor(
     private val getSimilarFilmsUseCase: GetSimilarFilmsUseCase
 ) : ViewModel() {
     private val calendar = Calendar.getInstance()
+
+    private var filmId = 328
 
     // FragmentHome
     private val _homePageList =
@@ -61,8 +67,8 @@ class CinemaViewModel @Inject constructor(
     ).flow.cachedIn(viewModelScope)
 
     // FragmentFilmDetail
-    private val _currentFilm = MutableSharedFlow<ResponseCurrentFilm>()
-    val currentFilm = _currentFilm.asSharedFlow()
+    private val _currentFilm = MutableStateFlow<ResponseCurrentFilm?>(null)
+    val currentFilm = _currentFilm.asStateFlow()
 
     private val _currentFilmActors = MutableStateFlow<List<ResponseStaffByFilmId>>(emptyList())
     val currentFilmActors = _currentFilmActors.asStateFlow()
@@ -70,8 +76,8 @@ class CinemaViewModel @Inject constructor(
     private val _currentFilmMakers = MutableStateFlow<List<ResponseStaffByFilmId>>(emptyList())
     val currentFilmMakers = _currentFilmMakers.asStateFlow()
 
-    private val _currentFilmGallery = MutableSharedFlow<ResponseFilmGallery>()
-    val currentFilmGallery = _currentFilmGallery.asSharedFlow()
+    private val _currentFilmGallery = MutableStateFlow<List<ItemImageGallery>>(emptyList())
+    val currentFilmGallery = _currentFilmGallery.asStateFlow()
 
     private val _currentFilmSimilar = MutableStateFlow<List<SimilarItem>>(emptyList())
     val currentFilmSimilar = _currentFilmSimilar.asStateFlow()
@@ -80,10 +86,11 @@ class CinemaViewModel @Inject constructor(
     val loadCurrentFilmState = _loadCurrentFilmState.asStateFlow()
 
     init {
-        getAllFilms()
+        getFilmsByCategories()
     }
 
-    fun getAllFilms(
+    // FragmentHome
+    fun getFilmsByCategories(
         year: Int = calendar.get(Calendar.YEAR),
         month: String = (calendar.get(Calendar.MONTH) + 1).converterInMonth()
     ) {
@@ -134,22 +141,29 @@ class CinemaViewModel @Inject constructor(
 
     fun getCurrentCategory() = currentCategory
 
+    // FragmentAllFilms
     fun getAllFilmAdapter() = allFilmAdapter
     fun setAllFilmAdapter(adapter: AllFilmAdapter) {
         allFilmAdapter = adapter
     }
 
+    // FragmentFilmDetail
     fun getFilmById(filmId: Int) {
+        this.filmId = filmId
         viewModelScope.launch {
             try {
                 _loadCurrentFilmState.value = StateLoading.Loading
+                // film
                 val tempFilm = getFilmByIdUseCase.executeFilmById(filmId)
-                _currentFilm.emit(tempFilm)
+                _currentFilm.value = tempFilm
+                // staffs
                 val tempActorList = getActorsByFilmIdUseCase.executeActorsList(filmId)
-                _currentFilmGallery.emit(
-                    getGalleryByIdUseCase.executeGalleryByFilmId(filmId, "STILL", 1)
-                )
                 sortingActorsAndMakers(tempActorList)
+                // gallery
+                setGalleryCount(filmId)
+                _currentFilmGallery.value =
+                    getGalleryByIdUseCase.executeGalleryByFilmId(filmId, "STILL", 1).items
+                // similar
                 val responseSimilar = getSimilarFilmsUseCase.executeSimilarFilms(filmId)
                 if (responseSimilar.total != 0) _currentFilmSimilar.value = responseSimilar.items!!
                 _loadCurrentFilmState.value = StateLoading.Success
@@ -158,6 +172,45 @@ class CinemaViewModel @Inject constructor(
             }
         }
     }
+
+    private val _galleryCount = MutableStateFlow(0)
+    val galleryCount = _galleryCount.asStateFlow()
+
+    private val _galleryChipList = MutableStateFlow<Map<String, Int>>(emptyMap())
+    val galleryChipList = _galleryChipList.asStateFlow()
+
+    private fun setGalleryCount(filmId: Int) {
+        _galleryCount.value = 0
+        val tempChipsList = mutableMapOf<String, Int>()
+        var countImages = 0
+        viewModelScope.launch(Dispatchers.IO) {
+            GALLERY_TYPES.forEach {
+                val temp = getGalleryByIdUseCase.executeGalleryByFilmId(filmId, it.key, 1)
+                tempChipsList[it.key] = temp.total
+                countImages += temp.total
+            }
+            _galleryCount.value = countImages
+            _galleryChipList.value = tempChipsList
+        }
+    }
+
+    // FragmentGallery
+    private var galleryType: String = "STILL"
+
+    fun setGalleryType(type: String) {
+        if (GALLERY_TYPES.keys.contains(type)) galleryType = type
+    }
+
+    val galleryByType: Flow<PagingData<ItemImageGallery>> = Pager(
+        config = PagingConfig(pageSize = 20),
+        pagingSourceFactory = {
+            GalleryFullPagingSource(
+                getGalleryByIdUseCase = getGalleryByIdUseCase,
+                filmId = filmId,
+                galleryType = galleryType
+            )
+        }
+    ).flow.cachedIn(viewModelScope)
 
     private fun sortingActorsAndMakers(actorsList: List<ResponseStaffByFilmId>) {
         val actors = mutableListOf<ResponseStaffByFilmId>()
