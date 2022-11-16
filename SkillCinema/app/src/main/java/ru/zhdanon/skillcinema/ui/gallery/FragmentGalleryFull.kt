@@ -44,9 +44,7 @@ class FragmentGalleryFull : Fragment() {
         setChipButton()             // Установка Chip-group
         setGalleryImages()          // Установка списка фотографий
 
-        binding.galleryBackBtn.setOnClickListener {
-            findNavController().navigate(R.id.action_fragmentGallery_to_fragmentFilmDetail)
-        }
+        binding.galleryBackBtn.setOnClickListener { requireActivity().onBackPressed() }
     }
 
     private fun setChipButton() {

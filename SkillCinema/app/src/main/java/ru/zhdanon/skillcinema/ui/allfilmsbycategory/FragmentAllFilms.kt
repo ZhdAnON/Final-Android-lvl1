@@ -7,7 +7,6 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
-import androidx.navigation.NavOptions
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import ru.zhdanon.skillcinema.R
@@ -45,13 +44,7 @@ class FragmentAllFilms : Fragment() {
         }
 
         binding.allFilmsToHomeBtn.setOnClickListener {
-            findNavController().navigate(
-                resId = R.id.fragmentHome,
-                args = null,
-                navOptions = NavOptions.Builder()
-                    .setPopUpTo(R.id.fragmentHome, true)
-                    .build()
-            )
+            requireActivity().onBackPressed()
         }
     }
 
@@ -62,12 +55,6 @@ class FragmentAllFilms : Fragment() {
 
     private fun onClickFilm(filmId: Int) {
         viewModel.getFilmById(filmId)
-        val action = FragmentAllFilmsDirections
-            .actionFragmentAllFilmsToFragmentFilmDetail(KEY_NAV_FRAGMENT_ALL_FILMS)
-        findNavController().navigate(action)
-    }
-
-    companion object {
-        const val KEY_NAV_FRAGMENT_ALL_FILMS = "Fragment All Films"
+        findNavController().navigate(R.id.action_fragmentAllFilms_to_fragmentFilmDetail)
     }
 }

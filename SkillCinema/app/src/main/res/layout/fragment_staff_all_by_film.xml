@@ -3,6 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
+    android:paddingHorizontal="26dp"
     android:layout_height="match_parent">
 
     <com.google.android.material.appbar.AppBarLayout
@@ -17,7 +18,7 @@
             android:layout_height="match_parent">
 
             <androidx.appcompat.widget.AppCompatImageView
-                android:id="@+id/all_films_to_home_btn"
+                android:id="@+id/all_staffs_back_btn"
                 android:layout_width="30dp"
                 android:layout_height="15dp"
                 android:layout_marginStart="26dp"
@@ -27,7 +28,7 @@
                 app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
-                android:id="@+id/all_films_category_tv"
+                android:id="@+id/all_staffs_category_tv"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/graphik_bold"
@@ -37,22 +38,21 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                tools:text="Сериалы" />
+                tools:text="В фильме снимались" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
     </com.google.android.material.appbar.AppBarLayout>
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/all_films_list"
-        android:layout_width="wrap_content"
+        android:id="@+id/all_staffs_list"
+        android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_marginTop="8dp"
-        android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/all_staffs_actionbar"
-        tools:listitem="@layout/item_film" />
+        tools:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+        tools:listitem="@layout/item_actor_film_detail"
+        tools:spanCount="2" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

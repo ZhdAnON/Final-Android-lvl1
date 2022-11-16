@@ -9,12 +9,8 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
-import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.launch
 import ru.zhdanon.skillcinema.R
 import ru.zhdanon.skillcinema.app.loadImage
 import ru.zhdanon.skillcinema.databinding.FragmentStaffDetailBinding
@@ -50,9 +46,7 @@ class FragmentStaffDetail : Fragment() {
         setLoadingStateAndDetails()
         getStaffInfo()
 
-        binding.staffDetailBackBtn.setOnClickListener {
-            findNavController().navigate(R.id.action_fragmentStaffDetail_to_fragmentFilmDetail)
-        }
+        binding.staffDetailBackBtn.setOnClickListener { requireActivity().onBackPressed() }
 
         binding.staffDetailShowAllFilmsBtn.setOnClickListener { getAllFilmsByStaff() }
     }
@@ -70,41 +64,43 @@ class FragmentStaffDetail : Fragment() {
     }
 
     private fun setLoadingStateAndDetails() {
-        viewModel.loadCurrentStaff.onEach { state ->
-            when (state) {
-                is StateLoading.Loading -> {
-                    binding.apply {
-                        progressGroup.isVisible = true
-                        loadingRefreshBtn.isVisible = false
-                        staffDetailMainGroup.isVisible = false
-                        staffDetailBestGroup.isVisible = false
-                        staffDetailFilmographyGroup.isVisible = false
+        viewLifecycleOwner.lifecycleScope.launchWhenStarted {
+            viewModel.loadCurrentStaff.collect { state ->
+                when (state) {
+                    is StateLoading.Loading -> {
+                        binding.apply {
+                            progressGroup.isVisible = true
+                            loadingRefreshBtn.isVisible = false
+                            staffDetailMainGroup.isVisible = false
+                            staffDetailBestGroup.isVisible = false
+                            staffDetailFilmographyGroup.isVisible = false
+                        }
                     }
-                }
-                is StateLoading.Success -> {
-                    binding.apply {
-                        progressGroup.isVisible = false
-                        loadingRefreshBtn.isVisible = false
-                        staffDetailMainGroup.isVisible = true
-                        staffDetailBestGroup.isVisible = true
-                        staffDetailFilmographyGroup.isVisible = true
+                    is StateLoading.Success -> {
+                        binding.apply {
+                            progressGroup.isVisible = false
+                            loadingRefreshBtn.isVisible = false
+                            staffDetailMainGroup.isVisible = true
+                            staffDetailBestGroup.isVisible = true
+                            staffDetailFilmographyGroup.isVisible = true
+                        }
                     }
-                }
-                else -> {
-                    binding.apply {
-                        progressGroup.isVisible = false
-                        loadingRefreshBtn.isVisible = true
-                        staffDetailMainGroup.isVisible = false
-                        staffDetailBestGroup.isVisible = false
-                        staffDetailFilmographyGroup.isVisible = false
+                    else -> {
+                        binding.apply {
+                            progressGroup.isVisible = false
+                            loadingRefreshBtn.isVisible = true
+                            staffDetailMainGroup.isVisible = false
+                            staffDetailBestGroup.isVisible = false
+                            staffDetailFilmographyGroup.isVisible = false
+                        }
                     }
                 }
             }
-        }.launchIn(viewLifecycleOwner.lifecycleScope)
+        }
     }
 
     private fun getStaffInfo() {
-        viewLifecycleOwner.lifecycleScope.launch {
+        viewLifecycleOwner.lifecycleScope.launchWhenStarted {
             viewModel.currentStaff.collect { staff ->
                 binding.apply {
                     staffDetailPoster.loadImage(staff.posterUrl)
@@ -143,6 +139,6 @@ class FragmentStaffDetail : Fragment() {
     }
 
     private fun getAllFilmsByStaff() {
-
+        // здесь будет код
     }
 }

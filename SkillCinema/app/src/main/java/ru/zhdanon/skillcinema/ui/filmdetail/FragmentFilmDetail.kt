@@ -10,9 +10,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import androidx.navigation.NavOptions
 import androidx.navigation.fragment.findNavController
-import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.coroutines.launch
@@ -23,10 +21,8 @@ import ru.zhdanon.skillcinema.data.staffbyfilmid.ResponseStaffByFilmId
 import ru.zhdanon.skillcinema.databinding.FragmentFilmDetailBinding
 import ru.zhdanon.skillcinema.ui.CinemaViewModel
 import ru.zhdanon.skillcinema.ui.StateLoading
-import ru.zhdanon.skillcinema.ui.allfilmsbycategory.FragmentAllFilms
 import ru.zhdanon.skillcinema.ui.filmdetail.galleryadapter.GalleryAdapter
 import ru.zhdanon.skillcinema.ui.filmdetail.staffadapter.StaffAdapter
-import ru.zhdanon.skillcinema.ui.home.FragmentHome
 import ru.zhdanon.skillcinema.ui.home.filmrecycler.FilmAdapter
 
 class FragmentFilmDetail : Fragment() {
@@ -51,8 +47,6 @@ class FragmentFilmDetail : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val navArg: FragmentFilmDetailArgs by navArgs()
-
         stateLoadingListener()              // Установка слушателя состояния загрузки
 
         setFilmDetails()                    // Установка постера, инфорации на нём и описания фильма
@@ -61,42 +55,12 @@ class FragmentFilmDetail : Fragment() {
         setFilmGallery()                    // Установка галереи фотографий
         setSimilarFilms()                   // Установка списка похожих фильмов
 
-        setButtonBackClick(navArg.keyNav)   // Установка навигации стрелкой "назад"
+        binding.btnBack.setOnClickListener { requireActivity().onBackPressed() }
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
-    }
-
-    private fun setButtonBackClick(navKey: String) {
-        binding.btnBack.setOnClickListener {
-            when (navKey) {
-                FragmentHome.KEY_NAV_FRAGMENT_HOME ->
-                    findNavController().navigate(
-                        resId = R.id.fragmentHome,
-                        args = null,
-                        navOptions = NavOptions.Builder()
-                            .setPopUpTo(R.id.fragmentHome, true)
-                            .build()
-                    )
-                FragmentAllFilms.KEY_NAV_FRAGMENT_ALL_FILMS ->
-                    findNavController().navigate(
-                        resId = R.id.fragmentAllFilms,
-                        args = null,
-                        navOptions = NavOptions.Builder()
-                            .setPopUpTo(R.id.fragmentAllFilms, true)
-                            .build()
-                    )
-                else -> findNavController().navigate(
-                    resId = R.id.fragmentHome,
-                    args = null,
-                    navOptions = NavOptions.Builder()
-                        .setPopUpTo(R.id.fragmentHome, true)
-                        .build()
-                )
-            }
-        }
     }
 
     private fun stateLoadingListener() {
@@ -176,16 +140,15 @@ class FragmentFilmDetail : Fragment() {
                 }
             }
         }
+        binding.filmActorsBtn.setOnClickListener { showAllStaffs("ACTOR") }
+        binding.filmActorsCount.setOnClickListener { showAllStaffs("ACTOR") }
     }
 
     private fun setFilmMakers() {
         makersAdapter = StaffAdapter { onStaffClick(it) }
         binding.filmMakersList.layoutManager =
             GridLayoutManager(
-                requireContext(),
-                MAX_MAKERS_ROWS,
-                GridLayoutManager.HORIZONTAL,
-                false
+                requireContext(), MAX_MAKERS_ROWS, GridLayoutManager.HORIZONTAL, false
             )
         binding.filmMakersList.adapter = makersAdapter
 
@@ -205,6 +168,8 @@ class FragmentFilmDetail : Fragment() {
                 }
             }
         }
+        binding.filmMakersBtn.setOnClickListener { showAllStaffs("") }
+        binding.filmMakersCount.setOnClickListener { showAllStaffs("") }
     }
 
     private fun onStaffClick(staff: ResponseStaffByFilmId) {
@@ -213,8 +178,17 @@ class FragmentFilmDetail : Fragment() {
         findNavController().navigate(action)
     }
 
+    private fun showAllStaffs(professionalKey: String) {
+        val action = FragmentFilmDetailDirections
+            .actionFragmentFilmDetailToFragmentAllStaffsByFilm(professionalKey)
+        findNavController().navigate(action)
+    }
+
     // Галерея фильма
     private fun setFilmGallery() {
+        binding.filmGalleryCount.setOnClickListener {
+            findNavController().navigate(R.id.action_fragmentFilmDetail_to_fragmentGallery)
+        }
         binding.filmGalleryBtn.setOnClickListener {
             findNavController().navigate(R.id.action_fragmentFilmDetail_to_fragmentGallery)
         }

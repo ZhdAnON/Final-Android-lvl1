@@ -44,6 +44,10 @@
             app:popUpTo="@id/fragmentFilmDetail"
             android:id="@+id/action_fragmentFilmDetail_to_fragmentGallery"
             app:destination="@id/fragmentGallery" />
+        <action
+            app:popUpTo="@id/fragmentFilmDetail"
+            android:id="@+id/action_fragmentFilmDetail_to_fragmentAllStaffsByFilm"
+            app:destination="@id/fragmentAllStaffsByFilm" />
     </fragment>
     <fragment
         tools:layout="@layout/fragment_all_films"
@@ -74,10 +78,6 @@
         android:name="ru.zhdanon.skillcinema.ui.gallery.FragmentGalleryFull"
         android:label="FragmentGallery" >
         <action
-            app:popUpTo="@id/fragmentFilmDetail"
-            android:id="@+id/action_fragmentGallery_to_fragmentFilmDetail"
-            app:destination="@id/fragmentFilmDetail" />
-        <action
             app:popUpTo="@id/fragmentGallery"
             android:id="@+id/action_fragmentGallery_to_fragmentGalleryFullscreen"
             app:destination="@id/fragmentGalleryFullscreen" />
@@ -87,4 +87,16 @@
         android:id="@+id/fragmentGalleryFullscreen"
         android:name="ru.zhdanon.skillcinema.ui.gallery.FragmentGalleryFullscreen"
         android:label="FragmentGalleryFullscreen" />
+    <fragment
+        tools:layout="@layout/fragment_staff_all_by_film"
+        android:id="@+id/fragmentAllStaffsByFilm"
+        android:name="ru.zhdanon.skillcinema.ui.allstaffbyfilm.FragmentAllStaffsByFilm"
+        android:label="FragmentAllStaffsByFilm" >
+        <argument
+            android:name="professionKey"
+            app:argType="string" />
+        <action
+            android:id="@+id/action_fragmentAllStaffsByFilm_to_fragmentStaffDetail"
+            app:destination="@id/fragmentStaffDetail" />
+    </fragment>
 </navigation>
