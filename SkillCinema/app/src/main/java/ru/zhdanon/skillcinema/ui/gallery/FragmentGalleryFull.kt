@@ -3,7 +3,6 @@ package ru.zhdanon.skillcinema.ui.gallery
 import android.content.res.ColorStateList
 import android.graphics.Color
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -18,10 +17,8 @@ import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
 import ru.zhdanon.skillcinema.R
 import ru.zhdanon.skillcinema.data.GALLERY_TYPES
-import ru.zhdanon.skillcinema.data.filmgallery.ItemImageGallery
 import ru.zhdanon.skillcinema.databinding.FragmentFilmGalleryBinding
 import ru.zhdanon.skillcinema.ui.CinemaViewModel
-import ru.zhdanon.skillcinema.ui.TAG
 import ru.zhdanon.skillcinema.ui.gallery.recycleradapter.GalleryFullAdapter
 
 class FragmentGalleryFull : Fragment() {
@@ -124,9 +121,10 @@ class FragmentGalleryFull : Fragment() {
         }
     }
 
-    private fun onClick(image: ItemImageGallery) {
-        Log.d(TAG, "GalleryFull: ${image.previewUrl}")
-        findNavController().navigate(R.id.action_fragmentGallery_to_fragmentGalleryFullscreen)
+    private fun onClick(position: Int) {
+        val action = FragmentGalleryFullDirections
+            .actionFragmentGalleryToFragmentGalleryFullscreen(position)
+        findNavController().navigate(action)
     }
 
     override fun onDestroyView() {

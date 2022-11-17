@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.PagerSnapHelper
 import ru.zhdanon.skillcinema.databinding.FragmentGalleryFullscreenBinding
@@ -32,6 +33,8 @@ class FragmentGalleryFullscreen : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        val args: FragmentGalleryFullscreenArgs by navArgs()
+
         adapter = GalleryFullscreenAdapter()
         PagerSnapHelper().attachToRecyclerView(binding.galleryImageFullscreenContainer)
         binding.galleryImageFullscreenContainer.layoutManager =
@@ -40,6 +43,7 @@ class FragmentGalleryFullscreen : Fragment() {
 
         viewLifecycleOwner.lifecycleScope.launchWhenStarted {
             viewModel.galleryByType.collect {
+                binding.galleryImageFullscreenContainer.scrollToPosition(args.position)
                 adapter.submitData(it)
             }
         }

@@ -8,7 +8,7 @@ import ru.zhdanon.skillcinema.data.filmgallery.ItemImageGallery
 import ru.zhdanon.skillcinema.databinding.ItemGalleryImageBinding
 
 class GalleryFullAdapter(
-    private val onClick: (ItemImageGallery) -> Unit
+    private val onClick: (Int) -> Unit
 ) : PagingDataAdapter<ItemImageGallery, GalleryFullViewHolder>(GalleryFullDiffUtil()) {
     override fun onBindViewHolder(holder: GalleryFullViewHolder, position: Int) {
         val item = getItem(position)
@@ -16,7 +16,7 @@ class GalleryFullAdapter(
             item?.let {
                 galleryImage.loadImage(it.previewUrl)
             }
-            holder.binding.galleryImage.setOnClickListener { item?.let { it1 -> onClick(it1) } }
+            holder.binding.galleryImage.setOnClickListener { onClick(position) }
         }
     }
 

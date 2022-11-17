@@ -89,7 +89,12 @@
         tools:layout="@layout/item_gallery_image"
         android:id="@+id/fragmentGalleryFullscreen"
         android:name="ru.zhdanon.skillcinema.ui.gallery.FragmentGalleryFullscreen"
-        android:label="FragmentGalleryFullscreen" />
+        android:label="FragmentGalleryFullscreen" >
+        <argument
+            android:name="position"
+            app:argType="integer"
+            android:defaultValue="0" />
+    </fragment>
     <fragment
         tools:layout="@layout/fragment_staff_all_by_film"
         android:id="@+id/fragmentAllStaffsByFilm"
