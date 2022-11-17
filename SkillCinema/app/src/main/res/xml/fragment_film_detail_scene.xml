@@ -23,8 +23,14 @@
             android:layout_width="match_parent"
             android:layout_height="400dp" />
         <Constraint
+            android:id="@+id/btn_back_field"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+        <Constraint
             android:id="@+id/film_name"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
+            motion:layout_constraintEnd_toEndOf="parent"
+            motion:layout_constraintStart_toEndOf="@id/btn_back_field"
             android:layout_height="1dp"
             motion:layout_constraintTop_toTopOf="parent" />
         <Constraint
@@ -42,9 +48,15 @@
             android:layout_height="1dp"
             motion:layout_constraintTop_toTopOf="parent" />
         <Constraint
+            android:id="@+id/btn_back_field"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+        <Constraint
             android:id="@+id/film_name"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="0dp"
+            motion:layout_constraintStart_toEndOf="@id/btn_back_field"
+            motion:layout_constraintEnd_toEndOf="parent"
             motion:layout_constraintBottom_toBottomOf="@id/btn_back_field"
             motion:layout_constraintTop_toTopOf="parent" />
         <Constraint

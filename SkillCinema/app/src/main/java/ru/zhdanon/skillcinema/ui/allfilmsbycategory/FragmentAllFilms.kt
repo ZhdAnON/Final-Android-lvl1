@@ -10,6 +10,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import ru.zhdanon.skillcinema.R
+import ru.zhdanon.skillcinema.data.CategoriesFilms
 import ru.zhdanon.skillcinema.databinding.FragmentAllFilmsBinding
 import ru.zhdanon.skillcinema.ui.CinemaViewModel
 import ru.zhdanon.skillcinema.ui.allfilmsbycategory.allfilmadapter.AllFilmAdapter
@@ -46,9 +47,17 @@ class FragmentAllFilms : Fragment() {
     }
 
     private fun setFilmList() {
-        viewLifecycleOwner.lifecycleScope.launchWhenStarted {
-            viewModel.allFilmsByCategory.collect {
-                viewModel.getAllFilmAdapter().submitData(it)
+        if (viewModel.getCurrentCategory() == CategoriesFilms.TV_SERIES) {
+            viewLifecycleOwner.lifecycleScope.launchWhenStarted {
+                viewModel.allSeries.collect {
+                    viewModel.getAllFilmAdapter().submitData(it)
+                }
+            }
+        } else {
+            viewLifecycleOwner.lifecycleScope.launchWhenStarted {
+                viewModel.allFilmsByCategory.collect {
+                    viewModel.getAllFilmAdapter().submitData(it)
+                }
             }
         }
     }

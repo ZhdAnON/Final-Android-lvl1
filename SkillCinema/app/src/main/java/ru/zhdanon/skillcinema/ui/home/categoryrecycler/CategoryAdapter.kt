@@ -23,7 +23,8 @@ class CategoryAdapter(
             maxListSize,
             category[position],
             { clickNextButton(it) },
-            { clickFilms(it) })
+            { clickFilms(it) }
+        )
     }
 
     override fun getItemCount() = category.size

@@ -35,9 +35,8 @@ class FragmentHome : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        stateLoadingListener()
-
-        getCategories()
+        stateLoadingListener()              // Установка слушателя состояния загрузки
+        getCategories()                     // Установка списка фильмов по категориям
     }
 
     override fun onDestroyView() {
@@ -56,10 +55,8 @@ class FragmentHome : Fragment() {
     }
 
     private fun onClickFilm(filmId: Int) {
-        val action =
-            FragmentHomeDirections.actionFragmentHomeToFragmentFilmDetail(KEY_NAV_FRAGMENT_HOME)
         viewModel.getFilmById(filmId)
-        findNavController().navigate(action)
+        findNavController().navigate(R.id.action_fragmentHome_to_fragmentFilmDetail)
     }
 
     private fun onClickShoAllButton(category: CategoriesFilms) {
@@ -91,9 +88,5 @@ class FragmentHome : Fragment() {
                 }
             }
         }
-    }
-
-    companion object {
-        const val KEY_NAV_FRAGMENT_HOME = "Fragment Home"
     }
 }

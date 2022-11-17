@@ -1,5 +1,6 @@
 package ru.zhdanon.skillcinema.ui.filmdetail
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -16,6 +17,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.coroutines.launch
 import ru.zhdanon.skillcinema.R
 import ru.zhdanon.skillcinema.app.loadImage
+import ru.zhdanon.skillcinema.data.CategoriesFilms
+import ru.zhdanon.skillcinema.data.TOP_TYPES
 import ru.zhdanon.skillcinema.data.filmbyid.ResponseCurrentFilm
 import ru.zhdanon.skillcinema.data.staffbyfilmid.ResponseStaffByFilmId
 import ru.zhdanon.skillcinema.databinding.FragmentFilmDetailBinding
@@ -36,9 +39,7 @@ class FragmentFilmDetail : Fragment() {
     private lateinit var similarAdapter: FilmAdapter
 
     override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
         _binding = FragmentFilmDetailBinding.inflate(layoutInflater)
         return binding.root
@@ -104,13 +105,20 @@ class FragmentFilmDetail : Fragment() {
                 lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
                     viewModel.currentFilm.collect { film ->
                         if (film != null) {
+                            if (film.type == TOP_TYPES.getValue(CategoriesFilms.TV_SERIES)) {
+                                binding.seasonsGroup.isVisible = true
+                                viewModel.getSeasons(film.kinopoiskId)
+                                getSeriesSeasons(getName(film))
+                            } else {
+                                binding.seasonsGroup.isVisible = false
+                            }
                             binding.apply {
                                 filmName.text = getName(film)
                                 filmPoster.loadImage(film.posterUrl)
                                 filmDescriptionShort.text = film.shortDescription
                                 filmDescriptionFull.text = film.description
                                 filmRatingNameTv.text = getRatingName(film)
-                                filmYearGenresTv.text = getYearGenres(film)
+                                filmYearGenresTv.text = getYearGenres(film, requireContext())
                                 filmCountryLengthAgeLimitTv.text = getStrCountriesLengthAge(film)
                             }
                         }
@@ -118,6 +126,43 @@ class FragmentFilmDetail : Fragment() {
                 }
             }
         }
+    }
+
+    // Информация о сезонах и сериях сериала
+    private fun getSeriesSeasons(seriesName: String) {
+        binding.seriesSeasonsBtn.setOnClickListener { showAllSeasons(seriesName) }
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.seasons.collect {
+                val seasonsCount = it.size
+                var seriesCount = 0
+                it.forEach { season ->
+                    seriesCount += season.episodes.size
+                }
+                val seasonStr =
+                    resources.getQuantityString(
+                        R.plurals.film_details_series_count,
+                        seasonsCount,
+                        seasonsCount
+                    )
+                val episodeStr =
+                    resources.getQuantityString(
+                        R.plurals.film_details_episode_count,
+                        seriesCount,
+                        seriesCount
+                    )
+                binding.seriesSeasonsCount.text = resources.getString(
+                    R.string.seasons_episodes_count,
+                    seasonStr,
+                    episodeStr
+                )
+            }
+        }
+    }
+
+    private fun showAllSeasons(seriesName: String) {
+        val action = FragmentFilmDetailDirections
+            .actionFragmentFilmDetailToFragmentSeries(seriesName)
+        findNavController().navigate(action)
     }
 
     // Список актёров и съёмочной группы
@@ -225,7 +270,9 @@ class FragmentFilmDetail : Fragment() {
         binding.filmSimilarBtn.setOnClickListener { showAllSimilarFilms() }
     }
 
-    private fun onSimilarFilmClick(filmId: Int) { viewModel.getFilmById(filmId) }
+    private fun onSimilarFilmClick(filmId: Int) {
+        viewModel.getFilmById(filmId)
+    }
 
     private fun showAllSimilarFilms() {
         findNavController().navigate(R.id.action_fragmentFilmDetail_to_fragmentSimilarFilms)
@@ -265,18 +312,35 @@ class FragmentFilmDetail : Fragment() {
             }
         }
 
-        private fun getYearGenres(film: ResponseCurrentFilm): String {
+        private fun getYearGenres(film: ResponseCurrentFilm, context: Context): String {
             val result = mutableListOf<String>()
-            if (film.year != null) result.add(film.year.toString())
+
+            if (film.type == TOP_TYPES.getValue(CategoriesFilms.TV_SERIES)) {
+                val tempStr = mutableListOf<String>()
+                if (film.startYear != null && film.endYear != null) {
+                    tempStr.add(film.startYear.toString())
+                    tempStr.add(film.endYear.toString())
+                } else {
+                    if (film.startYear != null) tempStr.add(film.startYear.toString())
+                    else context.getString(R.string.placeholder_series_start_year)
+                    if (film.endYear != null) tempStr.add(film.endYear.toString())
+                    else context.getString(R.string.placeholder_series_end_year)
+                }
+                result.add(tempStr.joinToString("-"))
+            } else {
+                if (film.year != null) result.add(film.year.toString())
+            }
+
+
             if (film.genres.size > 1) {
                 val genreNameList = mutableListOf<String>()
                 repeat(2) {
                     genreNameList.add(film.genres[it].genre)
                 }
                 result.add(genreNameList.joinToString(", "))
-            } else {
+            } else if (film.genres.size == 1) {
                 result.add(film.genres[0].genre)
-            }
+            } else result.add("")
             return result.joinToString(", ")
         }
 

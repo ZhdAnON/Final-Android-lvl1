@@ -3,7 +3,8 @@ package ru.zhdanon.skillcinema.data
 val TOP_TYPES = mapOf(
     CategoriesFilms.BEST to "TOP_250_BEST_FILMS",
     CategoriesFilms.POPULAR to "TOP_100_POPULAR_FILMS",
-    CategoriesFilms.AWAIT to "TOP_AWAIT_FILMS"
+    CategoriesFilms.AWAIT to "TOP_AWAIT_FILMS",
+    CategoriesFilms.TV_SERIES to "TV_SERIES"
 )
 
 enum class Month(val count: Int) {
@@ -31,4 +32,18 @@ val GALLERY_TYPES = mapOf(
     "WALLPAPER" to "обои",
     "COVER" to "обложки",
     "SCREENSHOT" to "скриншоты"
+)
+
+val SORTING_PARAMS = listOf(
+    "RATING",
+    "NUM_VOTE",
+    "YEAR"
+)
+
+val FILM_TYPE = listOf(
+    "FILM",
+    "TV_SHOW",
+    "TV_SERIES",
+    "MINI_SERIES",
+    "ALL"
 )

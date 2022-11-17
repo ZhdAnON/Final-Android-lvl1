@@ -31,10 +31,6 @@
         tools:layout="@layout/fragment_film_detail"
         android:name="ru.zhdanon.skillcinema.ui.filmdetail.FragmentFilmDetail"
         android:label="FragmentFilmDetail" >
-        <argument
-            android:name="keyNav"
-            app:argType="string"
-            android:defaultValue="FRAGMENT_HOME" />
         <action
             app:popUpTo="@id/fragmentFilmDetail"
             app:popUpToInclusive="true"
@@ -51,6 +47,10 @@
         <action
             android:id="@+id/action_fragmentFilmDetail_to_fragmentSimilarFilms"
             app:destination="@id/fragmentSimilarFilms" />
+        <action
+            app:popUpTo="@id/fragmentFilmDetail"
+            android:id="@+id/action_fragmentFilmDetail_to_fragmentSeries"
+            app:destination="@id/fragmentSeries" />
     </fragment>
     <fragment
         tools:layout="@layout/fragment_all_films"
@@ -109,10 +109,18 @@
     </fragment>
     <fragment
         android:id="@+id/fragmentSimilarFilms"
-        android:name="ru.zhdanon.skillcinema.ui.filmdetailsimilar.FragmentSimilarFilms"
+        android:name="ru.zhdanon.skillcinema.ui.filmdetail.FragmentSimilarFilms"
         android:label="FragmentSimilarFilms" >
         <action
             android:id="@+id/action_fragmentSimilarFilms_to_fragmentFilmDetail"
             app:destination="@id/fragmentFilmDetail" />
+    </fragment>
+    <fragment
+        android:id="@+id/fragmentSeries"
+        android:name="ru.zhdanon.skillcinema.ui.series.FragmentSeasons"
+        android:label="FragmentSeries" >
+        <argument
+            android:name="seriesName"
+            app:argType="string" />
     </fragment>
 </navigation>

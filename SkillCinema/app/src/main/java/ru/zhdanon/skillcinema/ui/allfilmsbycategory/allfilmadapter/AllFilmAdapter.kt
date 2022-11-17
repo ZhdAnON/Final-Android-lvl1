@@ -17,7 +17,7 @@ class AllFilmAdapter(
                 holder.binding.apply {
                     itemFilmPoster.loadImage(item.posterUrlPreview)
                     itemFilmName.text = item.nameRu
-                    itemFilmGenre.text = item.genres.joinToString(", ")
+                    itemFilmGenre.text = item.genres.joinToString(", ") { it.genre }
                 }
             }
         }

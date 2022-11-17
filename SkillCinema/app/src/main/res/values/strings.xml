@@ -21,6 +21,9 @@
     <string name="label_film_makers">Над фильмом работали</string>
     <string name="label_film_gallery">Галерея</string>
     <string name="label_film_similar">Похожие фильмы</string>
+    <string name="seasons_episodes_count">%s, %s</string>
+    <string name="placeholder_series_start_year">_</string>
+    <string name="placeholder_series_end_year">н.в.</string>
 
     <!-- Staff detail fragment -->
     <string name="staff_detail_filmography_label">Фильмография</string>
@@ -29,5 +32,10 @@
     <!-- Gallery full fragment -->
     <string name="title_gallery">Галерея</string>
     <string name="chip_name">%s %d</string>
+    <string name="label_series_seasons">Сезоны и серии</string>
+
+    <!-- Series seasons/episodes fragment -->
+    <string name="season_episode_name">%d серия. %s</string>
+    <string name="season_chip_name">%d</string>
 
 </resources>

@@ -17,6 +17,8 @@ class CinemaRepository @Inject constructor() {
     // FragmentFilmDetail
     suspend fun getFilmById(filmId: Int) = retrofit.getCurrentFilm(filmId)
 
+    suspend fun getSeasonsById(seriesId: Int) = retrofit.getSeasons(seriesId)
+
     suspend fun getActorsByFilmId(filmId: Int) = retrofit.getActors(filmId)
 
     suspend fun getGalleryByFilmId(filmId: Int, type: String, page: Int) =
@@ -28,30 +30,18 @@ class CinemaRepository @Inject constructor() {
     suspend fun getStaffById(staffId: Int) = retrofit.getStaff(staffId)
 
     // FragmentSearch
-    suspend fun getFilmsByFilter(
-        countries: String = "",
-        genres: String = "",
-        order: String = "YEAR",
-        type: String = "",
-        ratingFrom: Int = 0,
-        ratingTo: Int = 10,
-        yearFrom: Int = 1000,
-        yearTo: Int = 3000,
-        imdbId: String? = null,
-        keyword: String = "",
-        page: Int
-    ): List<FilmByFilter> {
+    suspend fun getFilmsByFilter(filters: FilmFilterParams, page: Int): List<FilmByFilter> {
         return retrofit.getFilmsByFilter(
-            countries = countries,
-            genres = genres,
-            order = order,
-            type = type,
-            ratingFrom = ratingFrom,
-            ratingTo = ratingTo,
-            yearFrom = yearFrom,
-            yearTo = yearTo,
-            imdbId = imdbId,
-            keyword = keyword,
+            countries = "",
+            genres = "",
+            order = filters.order,
+            type = filters.type,
+            ratingFrom = filters.ratingFrom,
+            ratingTo = filters.ratingTo,
+            yearFrom = filters.yearFrom,
+            yearTo = filters.yearTo,
+            imdbId = filters.imdbId,
+            keyword = filters.keyword,
             page = page
         ).items
     }
@@ -60,10 +50,7 @@ class CinemaRepository @Inject constructor() {
         return retrofit.getFilmsTop(type = topType, page = page).films
     }
 
-    suspend fun getFilmsPremier(
-        year: Int,
-        month: String
-    ): List<FilmPremier> {
+    suspend fun getFilmsPremier(year: Int, month: String): List<FilmPremier> {
         return retrofit.getPremier(year, month).items
     }
 

@@ -116,6 +116,7 @@ class FragmentGalleryFull : Fragment() {
 
         viewLifecycleOwner.lifecycleScope.launchWhenStarted {
             viewModel.galleryByType.collect {
+                galleryAdapter.refresh()
                 galleryAdapter.submitData(it)
             }
         }

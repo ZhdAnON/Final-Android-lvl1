@@ -1,7 +1,6 @@
 package ru.zhdanon.skillcinema.ui.staffdetail
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -16,7 +15,6 @@ import ru.zhdanon.skillcinema.app.loadImage
 import ru.zhdanon.skillcinema.databinding.FragmentStaffDetailBinding
 import ru.zhdanon.skillcinema.entity.HomeItem
 import ru.zhdanon.skillcinema.ui.StateLoading
-import ru.zhdanon.skillcinema.ui.TAG
 import ru.zhdanon.skillcinema.ui.home.filmrecycler.FilmAdapter
 
 class FragmentStaffDetail : Fragment() {
@@ -115,22 +113,16 @@ class FragmentStaffDetail : Fragment() {
                             staff.films.size
                         )
                     if (staff.films != null) {
-                        staff.films.map {
-                            Log.d(TAG, "staff рейтинг - ${it.rating}")
-                        }
                         val list: MutableList<HomeItem> = staff.films.toMutableList()
                         list.removeAll { it.rating == null }
                         val sortedList = list.sortedBy { it.rating?.toDouble() }.reversed()
                         val result = mutableListOf<HomeItem>()
+
                         if (sortedList.size > 10) {
-                            repeat(10) {
-                                result.add(sortedList[it])
-                            }
+                            repeat(10) { result.add(sortedList[it]) }
                         } else result.addAll(sortedList)
+
                         result.sortedBy { it.rating }
-                        result.map {
-                            Log.d(TAG, "result рейтинг - ${it.rating}")
-                        }
                         filmAdapter.submitList(result)
                     }
                 }

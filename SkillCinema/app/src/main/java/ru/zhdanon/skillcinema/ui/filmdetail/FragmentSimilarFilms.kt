@@ -1,4 +1,4 @@
-package ru.zhdanon.skillcinema.ui.filmdetailsimilar
+package ru.zhdanon.skillcinema.ui.filmdetail
 
 import android.os.Bundle
 import android.view.LayoutInflater
