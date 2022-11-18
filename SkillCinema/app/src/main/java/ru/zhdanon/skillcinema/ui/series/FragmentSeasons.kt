@@ -57,6 +57,8 @@ class FragmentSeasons : Fragment() {
     private fun setEpisodeList() {
         viewLifecycleOwner.lifecycleScope.launchWhenStarted {
             viewModel.seasons.collect { seasons ->
+                binding.seasonEpisodeCount.text =
+                    getSeasonLabel(seasons[0].number, seasons[0].episodes.size)
                 adapter.submitList(seasons[0].episodes)
                 setChipGroup(seasons)
             }
@@ -103,7 +105,11 @@ class FragmentSeasons : Fragment() {
                 isSelected = false
                 isChecked = chipGroup.size == 0
             }
-            chip.setOnClickListener { adapter.submitList(seasons[i].episodes) }
+            chip.setOnClickListener {
+                binding.seasonEpisodeCount.text =
+                    getSeasonLabel(seasons[i].number, seasons[i].episodes.size)
+                adapter.submitList(seasons[i].episodes)
+            }
             chipGroup.addView(chip)
         }
         binding.seriesChipsGroupContainer.addView(chipGroup)
@@ -112,5 +118,18 @@ class FragmentSeasons : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    private fun getSeasonLabel(seasonNumber: Int, episodeCount: Int): String {
+        val episodeStr = resources.getQuantityString(
+            R.plurals.film_details_episode_count,
+            episodeCount,
+            episodeCount
+        )
+        return resources.getString(
+            R.string.episodes_count,
+            seasonNumber,
+            episodeStr
+        )
     }
 }

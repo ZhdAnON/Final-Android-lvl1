@@ -32,10 +32,12 @@
     <!-- Gallery full fragment -->
     <string name="title_gallery">Галерея</string>
     <string name="chip_name">%s %d</string>
-    <string name="label_series_seasons">Сезоны и серии</string>
 
     <!-- Series seasons/episodes fragment -->
+    <string name="label_series_seasons">Сезоны и серии</string>
+    <string name="label_season_episodes_count">Сезон</string>
     <string name="season_episode_name">%d серия. %s</string>
     <string name="season_chip_name">%d</string>
+    <string name="episodes_count">%d сезон, %s</string>
 
 </resources>
