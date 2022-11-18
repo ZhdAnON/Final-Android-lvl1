@@ -38,8 +38,7 @@ class FragmentGalleryFull : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        setChipButton()             // Установка Chip-group
-        setGalleryImages()          // Установка списка фотографий
+        setChipButton()             // Установка Chip-group и получение изображений
 
         binding.galleryBackBtn.setOnClickListener { requireActivity().onBackPressed() }
     }
@@ -47,27 +46,6 @@ class FragmentGalleryFull : Fragment() {
     private fun setChipButton() {
         viewLifecycleOwner.lifecycleScope.launchWhenStarted {
             viewModel.galleryChipList.collect {
-                val chipBackColors = ColorStateList(
-                    arrayOf(
-                        intArrayOf(android.R.attr.state_checked, android.R.attr.state_enabled),
-                        intArrayOf()
-                    ),
-                    intArrayOf(Color.BLUE, Color.WHITE)
-                )
-                val chipTextColors = ColorStateList(
-                    arrayOf(
-                        intArrayOf(android.R.attr.state_checked, android.R.attr.state_enabled),
-                        intArrayOf()
-                    ),
-                    intArrayOf(Color.WHITE, Color.BLACK)
-                )
-                val chipStrokeColors = ColorStateList(
-                    arrayOf(
-                        intArrayOf(android.R.attr.state_checked, android.R.attr.state_enabled),
-                        intArrayOf()
-                    ),
-                    intArrayOf(Color.BLUE, Color.BLACK)
-                )
                 val chipGroup = ChipGroup(requireContext()).apply {
                     isSingleSelection = true
                     chipSpacingHorizontal = 8
@@ -85,10 +63,14 @@ class FragmentGalleryFull : Fragment() {
                             transitionName = key
                             chipStrokeWidth = 1f
                             isSelected = false
-                            isChecked = chipGroup.size == 0
                         }
                         chip.setOnClickListener { myChip ->
-                            viewModel.setGalleryType(myChip.transitionName)
+                            viewModel.updateParamsFilterGallery(galleryType = myChip.transitionName)
+                            galleryAdapter.refresh()
+                        }
+                        if (chipGroup.size == 0) {
+                            chip.isChecked = true
+                            setGalleryImages(chip.transitionName)
                             galleryAdapter.refresh()
                         }
                         chipGroup.addView(chip)
@@ -99,7 +81,10 @@ class FragmentGalleryFull : Fragment() {
         }
     }
 
-    private fun setGalleryImages() {
+    // Получение изображений
+    private fun setGalleryImages(galleryType: String) {
+        galleryAdapter = GalleryFullAdapter { onClick(it) }
+
         val gridManager =
             GridLayoutManager(context, 2, GridLayoutManager.VERTICAL, false)
                 .apply {
@@ -110,13 +95,11 @@ class FragmentGalleryFull : Fragment() {
                     }
                 }
         binding.filmGalleryPager.layoutManager = gridManager
-
-        galleryAdapter = GalleryFullAdapter { onClick(it) }
         binding.filmGalleryPager.adapter = galleryAdapter
 
         viewLifecycleOwner.lifecycleScope.launchWhenStarted {
+            viewModel.updateParamsFilterGallery(galleryType = galleryType)
             viewModel.galleryByType.collect {
-                galleryAdapter.refresh()
                 galleryAdapter.submitData(it)
             }
         }
@@ -131,5 +114,29 @@ class FragmentGalleryFull : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    companion object {
+        val chipBackColors = ColorStateList(
+            arrayOf(
+                intArrayOf(android.R.attr.state_checked, android.R.attr.state_enabled),
+                intArrayOf()
+            ),
+            intArrayOf(Color.BLUE, Color.WHITE)
+        )
+        val chipTextColors = ColorStateList(
+            arrayOf(
+                intArrayOf(android.R.attr.state_checked, android.R.attr.state_enabled),
+                intArrayOf()
+            ),
+            intArrayOf(Color.WHITE, Color.BLACK)
+        )
+        val chipStrokeColors = ColorStateList(
+            arrayOf(
+                intArrayOf(android.R.attr.state_checked, android.R.attr.state_enabled),
+                intArrayOf()
+            ),
+            intArrayOf(Color.BLUE, Color.BLACK)
+        )
     }
 }

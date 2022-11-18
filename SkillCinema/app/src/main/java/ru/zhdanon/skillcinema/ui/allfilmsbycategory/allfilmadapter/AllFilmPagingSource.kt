@@ -1,19 +1,17 @@
 package ru.zhdanon.skillcinema.ui.allfilmsbycategory.allfilmadapter
 
-import android.util.Log
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import ru.zhdanon.skillcinema.data.CategoriesFilms
-import ru.zhdanon.skillcinema.data.FilmFilterParams
+import ru.zhdanon.skillcinema.data.ParamsFilterFilm
 import ru.zhdanon.skillcinema.data.TOP_TYPES
 import ru.zhdanon.skillcinema.domain.GetFilmListUseCase
 import ru.zhdanon.skillcinema.domain.GetPremierFilmUseCase
 import ru.zhdanon.skillcinema.domain.GetTopFilmsUseCase
 import ru.zhdanon.skillcinema.entity.HomeItem
-import ru.zhdanon.skillcinema.ui.TAG
 
 class AllFilmPagingSource(
-    private val filterParams: FilmFilterParams,
+    private val filterParams: ParamsFilterFilm,
     private val categoriesFilms: CategoriesFilms,
     private val year: Int,
     private val month: String,
@@ -28,11 +26,9 @@ class AllFilmPagingSource(
         return kotlin.runCatching {
             when (categoriesFilms) {
                 CategoriesFilms.PREMIERS -> {
-                    Log.d(TAG, "AllFilmPagingSource load: PREMIERS")
                     getPremierFilmUseCase.executePremieres(year, month)
                 }
                 CategoriesFilms.TV_SERIES -> {
-                    Log.d(TAG, "AllFilmPagingSource load: TV_SERIES")
                     getFilmListUseCase
                         .executeFilmsByFilter(
                             filters = filterParams,
@@ -40,7 +36,6 @@ class AllFilmPagingSource(
                         )
                 }
                 else -> {
-                    Log.d(TAG, "AllFilmPagingSource load: other films")
                     getTopFilmsUseCase.executeTopFilms(
                         topType = TOP_TYPES.getValue(categoriesFilms),
                         page = page

@@ -30,7 +30,7 @@ class CinemaRepository @Inject constructor() {
     suspend fun getStaffById(staffId: Int) = retrofit.getStaff(staffId)
 
     // FragmentSearch
-    suspend fun getFilmsByFilter(filters: FilmFilterParams, page: Int): List<FilmByFilter> {
+    suspend fun getFilmsByFilter(filters: ParamsFilterFilm, page: Int): List<FilmByFilter> {
         return retrofit.getFilmsByFilter(
             countries = "",
             genres = "",

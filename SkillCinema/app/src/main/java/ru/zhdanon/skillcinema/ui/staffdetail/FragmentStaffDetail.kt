@@ -41,13 +41,12 @@ class FragmentStaffDetail : Fragment() {
         val args: FragmentStaffDetailArgs by navArgs()
         viewModel.getStaffDetail(args.staffId)
 
-        setBestFilmsAdapter()
+        setBestFilmsAdapter()                   // Установка адаптера
 
-        setLoadingStateAndDetails()
-        getStaffInfo()
+        setLoadingStateAndDetails()             // Отслеживание состояния загрузки
+        getStaffInfo()                          // Получение информации о персоне
 
-        binding.staffDetailBackBtn.setOnClickListener { requireActivity().onBackPressed() }
-        binding.staffDetailShowAllFilmsBtn.setOnClickListener { getAllFilmsByStaff() }
+        setButtonsListeners()                   // Установка листенеров кнопок и надписей
     }
 
     override fun onDestroyView() {
@@ -140,5 +139,13 @@ class FragmentStaffDetail : Fragment() {
 
     private fun getAllFilmsByStaff() {
         findNavController().navigate(R.id.action_fragmentStaffDetail_to_fragmentFilmography)
+    }
+
+    private fun setButtonsListeners() {
+        binding.staffDetailBackBtn.setOnClickListener { requireActivity().onBackPressed() }
+        binding.staffDetailShowAllFilmsBtn.setOnClickListener { getAllFilmsByStaff() }
+        binding.staffDetailShowAllFilmsTv.setOnClickListener { getAllFilmsByStaff() }
+        binding.staffDetailShowAllBestBtn.setOnClickListener { getAllFilmsByStaff() }
+        binding.staffDetailShowAllBestTv.setOnClickListener { getAllFilmsByStaff() }
     }
 }

@@ -1,5 +1,6 @@
 package ru.zhdanon.skillcinema.ui
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.Pager
@@ -14,10 +15,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import ru.zhdanon.skillcinema.app.converterInMonth
 import ru.zhdanon.skillcinema.app.prepareToShow
-import ru.zhdanon.skillcinema.data.CategoriesFilms
-import ru.zhdanon.skillcinema.data.FilmFilterParams
-import ru.zhdanon.skillcinema.data.GALLERY_TYPES
-import ru.zhdanon.skillcinema.data.TOP_TYPES
+import ru.zhdanon.skillcinema.data.*
 import ru.zhdanon.skillcinema.data.filmbyid.ResponseCurrentFilm
 import ru.zhdanon.skillcinema.data.filmgallery.ItemImageGallery
 import ru.zhdanon.skillcinema.data.seasons.Season
@@ -63,7 +61,7 @@ class CinemaViewModel @Inject constructor(
         config = PagingConfig(pageSize = 20),
         pagingSourceFactory = {
             AllFilmPagingSource(
-                filterParams = currentFilterParams,
+                filterParams = currentParamsFilterFilm,
                 categoriesFilms = currentCategory,
                 year = calendar.get(Calendar.YEAR),
                 month = (calendar.get(Calendar.MONTH) + 1).converterInMonth(),
@@ -111,7 +109,7 @@ class CinemaViewModel @Inject constructor(
                     HomeList(
                         category = CategoriesFilms.TV_SERIES,
                         filmList = getFilmListUseCase.executeFilmsByFilter(
-                            filters = FilmFilterParams(
+                            filters = ParamsFilterFilm(
                                 type = TOP_TYPES.getValue(CategoriesFilms.TV_SERIES),
                                 ratingFrom = 6
                             ),
@@ -147,7 +145,7 @@ class CinemaViewModel @Inject constructor(
         config = PagingConfig(pageSize = 20),
         pagingSourceFactory = {
             FilmsByFilterPagingSource(
-                filters = FilmFilterParams(type = TOP_TYPES.getValue(CategoriesFilms.TV_SERIES)),
+                filters = ParamsFilterFilm(type = TOP_TYPES.getValue(CategoriesFilms.TV_SERIES)),
                 getFilmListUseCase = getFilmListUseCase
             )
         }
@@ -177,6 +175,7 @@ class CinemaViewModel @Inject constructor(
 
     fun getFilmById(filmId: Int) {
         currentFilmId = filmId
+        updateParamsFilterGallery()
         viewModelScope.launch {
             try {
                 _loadCurrentFilmState.value = StateLoading.Loading
@@ -189,7 +188,11 @@ class CinemaViewModel @Inject constructor(
                 // gallery
                 setGalleryCount(filmId)
                 _currentFilmGallery.value =
-                    getGalleryByIdUseCase.executeGalleryByFilmId(filmId, "STILL", 1).items
+                    getGalleryByIdUseCase.executeGalleryByFilmId(
+                        currentParamsFilterGallery.filmId,
+                        currentParamsFilterGallery.galleryType,
+                        1
+                    ).items
                 // similar
                 val responseSimilar = getSimilarFilmsUseCase.executeSimilarFilms(filmId)
                 if (responseSimilar.total != 0) _currentFilmSimilar.value = responseSimilar.items!!
@@ -218,8 +221,6 @@ class CinemaViewModel @Inject constructor(
     }
 
     // FragmentGallery
-    private var galleryType: String = "STILL"
-
     private val _galleryCount = MutableStateFlow(0)
     val galleryCount = _galleryCount.asStateFlow()
 
@@ -229,10 +230,13 @@ class CinemaViewModel @Inject constructor(
     val galleryByType: Flow<PagingData<ItemImageGallery>> = Pager(
         config = PagingConfig(pageSize = 20),
         pagingSourceFactory = {
+            Log.d(
+                TAG,
+                "CVM-235: galleryByType: ${currentParamsFilterGallery.filmId} | ${currentParamsFilterGallery.galleryType}"
+            )
             GalleryFullPagingSource(
                 getGalleryByIdUseCase = getGalleryByIdUseCase,
-                filmId = currentFilmId,
-                galleryType = galleryType
+                filterParams = currentParamsFilterGallery
             )
         }
     ).flow.cachedIn(viewModelScope)
@@ -252,8 +256,9 @@ class CinemaViewModel @Inject constructor(
         }
     }
 
-    fun setGalleryType(type: String) {
-        if (GALLERY_TYPES.keys.contains(type)) galleryType = type
+    fun updateParamsFilterGallery(filmId: Int = currentFilmId, galleryType: String = "STILL") {
+        currentParamsFilterGallery =
+            currentParamsFilterGallery.copy(filmId = filmId, galleryType = galleryType)
     }
 
     // FragmentStaffDetail
@@ -279,7 +284,7 @@ class CinemaViewModel @Inject constructor(
     companion object {
         private val calendar = Calendar.getInstance()
 
-        private var currentFilterParams = FilmFilterParams(
+        private var currentParamsFilterFilm = ParamsFilterFilm(
             countries = "",
             genres = "",
             order = "RATING",
@@ -290,6 +295,11 @@ class CinemaViewModel @Inject constructor(
             yearTo = 3000,
             imdbId = null,
             keyword = ""
+        )
+
+        private var currentParamsFilterGallery = ParamsFilterGallery(
+            filmId = 328,
+            galleryType = "STILL"
         )
 
         data class HomeList(

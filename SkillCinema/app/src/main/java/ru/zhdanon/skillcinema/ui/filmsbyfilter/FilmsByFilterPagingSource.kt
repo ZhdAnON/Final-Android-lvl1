@@ -2,12 +2,12 @@ package ru.zhdanon.skillcinema.ui.filmsbyfilter
 
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
-import ru.zhdanon.skillcinema.data.FilmFilterParams
+import ru.zhdanon.skillcinema.data.ParamsFilterFilm
 import ru.zhdanon.skillcinema.domain.GetFilmListUseCase
 import ru.zhdanon.skillcinema.entity.HomeItem
 
 class FilmsByFilterPagingSource(
-    private val filters: FilmFilterParams,
+    private val filters: ParamsFilterFilm,
     private val getFilmListUseCase: GetFilmListUseCase
 ) : PagingSource<Int, HomeItem>() {
     override fun getRefreshKey(state: PagingState<Int, HomeItem>): Int = FIRST_PAGE

@@ -55,7 +55,7 @@ class FragmentHome : Fragment() {
     }
 
     private fun onClickFilm(filmId: Int) {
-        viewModel.getFilmById(filmId)
+        viewModel.getFilmById(filmId = filmId)
         findNavController().navigate(R.id.action_fragmentHome_to_fragmentFilmDetail)
     }
 
