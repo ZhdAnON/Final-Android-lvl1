@@ -4,10 +4,12 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import androidx.paging.LoadState
 import androidx.recyclerview.widget.GridLayoutManager
 import ru.zhdanon.skillcinema.R
 import ru.zhdanon.skillcinema.data.CategoriesFilms
@@ -33,6 +35,7 @@ class FragmentAllFilms : Fragment() {
 
         binding.allFilmsCategoryTv.text = viewModel.getCurrentCategory().text
         binding.allFilmsToHomeBtn.setOnClickListener { requireActivity().onBackPressed() }
+        binding.loadingRefreshBtn.setOnClickListener { viewModel.getAllFilmAdapter().retry() }
 
         setAdapter()                // Установка адаптера
         setFilmList()               // Установка списка фильмов
@@ -44,6 +47,26 @@ class FragmentAllFilms : Fragment() {
         binding.allFilmsList.layoutManager =
             GridLayoutManager(requireContext(), 2, GridLayoutManager.VERTICAL, false)
         binding.allFilmsList.adapter = viewModel.getAllFilmAdapter()
+
+        viewLifecycleOwner.lifecycleScope.launchWhenStarted {
+            viewModel.getAllFilmAdapter().loadStateFlow.collect { state ->
+                val currentState = state.refresh
+                binding.progressGroup.isVisible = currentState == LoadState.Loading
+                binding.loadingRefreshBtn.isVisible = currentState != LoadState.Loading
+                when (currentState) {
+                    is LoadState.Error -> {
+                        binding.allFilmsList.isVisible = false
+                        binding.progressGroup.isVisible = true
+                        binding.loadingProgress.isVisible = false
+                    }
+                    else -> {
+                        binding.allFilmsList.isVisible = true
+                        binding.progressGroup.isVisible = false
+                        binding.loadingProgress.isVisible = false
+                    }
+                }
+            }
+        }
     }
 
     private fun setFilmList() {

@@ -23,6 +23,7 @@ import ru.zhdanon.skillcinema.data.filmgallery.ItemImageGallery
 import ru.zhdanon.skillcinema.data.seasons.Season
 import ru.zhdanon.skillcinema.data.similarfilm.SimilarItem
 import ru.zhdanon.skillcinema.data.staffbyfilmid.ResponseStaffByFilmId
+import ru.zhdanon.skillcinema.data.staffbyid.ResponseStaffById
 import ru.zhdanon.skillcinema.domain.*
 import ru.zhdanon.skillcinema.entity.HomeItem
 import ru.zhdanon.skillcinema.ui.allfilmsbycategory.allfilmadapter.AllFilmAdapter
@@ -41,24 +42,15 @@ class CinemaViewModel @Inject constructor(
     private val getGalleryByIdUseCase: GetGalleryByIdUseCase,
     private val getSimilarFilmsUseCase: GetSimilarFilmsUseCase,
     private val getFilmListUseCase: GetFilmListUseCase,
-    private val getSeasonsUseCase: GetSeasonsUseCase
+    private val getSeasonsUseCase: GetSeasonsUseCase,
+    private val getStaffByIdUseCase: GetStaffByIdUseCase
 ) : ViewModel() {
-    private val calendar = Calendar.getInstance()
 
-    private var filmId = 328
+    private var currentFilmId = 328
 
-    private var currentFilterParams = FilmFilterParams(
-        countries = "",
-        genres = "",
-        order = "RATING",
-        type = "",
-        ratingFrom = 0,
-        ratingTo = 10,
-        yearFrom = 1000,
-        yearTo = 3000,
-        imdbId = null,
-        keyword = ""
-    )
+    init {
+        getFilmsByCategories()
+    }
 
     // FragmentHome
     private val _homePageList = MutableStateFlow<List<HomeList>>(emptyList())
@@ -66,10 +58,6 @@ class CinemaViewModel @Inject constructor(
 
     private val _loadCategoryState = MutableStateFlow<StateLoading>(StateLoading.Default)
     val loadCategoryState = _loadCategoryState.asStateFlow()
-
-    // FragmentAllFilms
-    private var allFilmAdapter: AllFilmAdapter = AllFilmAdapter { }
-    private lateinit var currentCategory: CategoriesFilms
 
     val allFilmsByCategory: Flow<PagingData<HomeItem>> = Pager(
         config = PagingConfig(pageSize = 20),
@@ -84,45 +72,6 @@ class CinemaViewModel @Inject constructor(
         }
     ).flow.cachedIn(viewModelScope)
 
-    // FragmentGallery
-    val galleryByType: Flow<PagingData<ItemImageGallery>> = Pager(
-        config = PagingConfig(pageSize = 20),
-        pagingSourceFactory = {
-            GalleryFullPagingSource(
-                getGalleryByIdUseCase = getGalleryByIdUseCase,
-                filmId = filmId,
-                galleryType = galleryType
-            )
-        }
-    ).flow.cachedIn(viewModelScope)
-
-    // FragmentFilmDetail
-    private val _currentFilm = MutableStateFlow<ResponseCurrentFilm?>(null)
-    val currentFilm = _currentFilm.asStateFlow()
-
-    private val _seasons = MutableStateFlow<List<Season>>(emptyList())
-    val seasons = _seasons.asStateFlow()
-
-    private val _currentFilmActors = MutableStateFlow<List<ResponseStaffByFilmId>>(emptyList())
-    val currentFilmActors = _currentFilmActors.asStateFlow()
-
-    private val _currentFilmMakers = MutableStateFlow<List<ResponseStaffByFilmId>>(emptyList())
-    val currentFilmMakers = _currentFilmMakers.asStateFlow()
-
-    private val _currentFilmGallery = MutableStateFlow<List<ItemImageGallery>>(emptyList())
-    val currentFilmGallery = _currentFilmGallery.asStateFlow()
-
-    private val _currentFilmSimilar = MutableStateFlow<List<SimilarItem>>(emptyList())
-    val currentFilmSimilar = _currentFilmSimilar.asStateFlow()
-
-    private val _loadCurrentFilmState = MutableStateFlow<StateLoading>(StateLoading.Default)
-    val loadCurrentFilmState = _loadCurrentFilmState.asStateFlow()
-
-    init {
-        getFilmsByCategories()
-    }
-
-    // FragmentHome
     fun getFilmsByCategories(
         year: Int = calendar.get(Calendar.YEAR),
         month: String = (calendar.get(Calendar.MONTH) + 1).converterInMonth()
@@ -178,6 +127,10 @@ class CinemaViewModel @Inject constructor(
         }
     }
 
+    // FragmentAllFilms
+    private var allFilmAdapter: AllFilmAdapter = AllFilmAdapter { }
+
+    private lateinit var currentCategory: CategoriesFilms
     fun setCurrentCategory(category: CategoriesFilms) {
         currentCategory = category
         if (allFilmAdapter.itemCount != 0) allFilmAdapter.refresh()
@@ -185,7 +138,6 @@ class CinemaViewModel @Inject constructor(
 
     fun getCurrentCategory() = currentCategory
 
-    // FragmentAllFilms
     fun getAllFilmAdapter() = allFilmAdapter
     fun setAllFilmAdapter(adapter: AllFilmAdapter) {
         allFilmAdapter = adapter
@@ -202,8 +154,29 @@ class CinemaViewModel @Inject constructor(
     ).flow.cachedIn(viewModelScope)
 
     // FragmentFilmDetail
+    private val _currentFilm = MutableStateFlow<ResponseCurrentFilm?>(null)
+    val currentFilm = _currentFilm.asStateFlow()
+
+    private val _seasons = MutableStateFlow<List<Season>>(emptyList())
+    val seasons = _seasons.asStateFlow()
+
+    private val _currentFilmActors = MutableStateFlow<List<ResponseStaffByFilmId>>(emptyList())
+    val currentFilmActors = _currentFilmActors.asStateFlow()
+
+    private val _currentFilmMakers = MutableStateFlow<List<ResponseStaffByFilmId>>(emptyList())
+    val currentFilmMakers = _currentFilmMakers.asStateFlow()
+
+    private val _currentFilmGallery = MutableStateFlow<List<ItemImageGallery>>(emptyList())
+    val currentFilmGallery = _currentFilmGallery.asStateFlow()
+
+    private val _currentFilmSimilar = MutableStateFlow<List<SimilarItem>>(emptyList())
+    val currentFilmSimilar = _currentFilmSimilar.asStateFlow()
+
+    private val _loadCurrentFilmState = MutableStateFlow<StateLoading>(StateLoading.Default)
+    val loadCurrentFilmState = _loadCurrentFilmState.asStateFlow()
+
     fun getFilmById(filmId: Int) {
-        this.filmId = filmId
+        currentFilmId = filmId
         viewModelScope.launch {
             try {
                 _loadCurrentFilmState.value = StateLoading.Loading
@@ -244,11 +217,25 @@ class CinemaViewModel @Inject constructor(
         _currentFilmMakers.value = makers
     }
 
+    // FragmentGallery
+    private var galleryType: String = "STILL"
+
     private val _galleryCount = MutableStateFlow(0)
     val galleryCount = _galleryCount.asStateFlow()
 
     private val _galleryChipList = MutableStateFlow<Map<String, Int>>(emptyMap())
     val galleryChipList = _galleryChipList.asStateFlow()
+
+    val galleryByType: Flow<PagingData<ItemImageGallery>> = Pager(
+        config = PagingConfig(pageSize = 20),
+        pagingSourceFactory = {
+            GalleryFullPagingSource(
+                getGalleryByIdUseCase = getGalleryByIdUseCase,
+                filmId = currentFilmId,
+                galleryType = galleryType
+            )
+        }
+    ).flow.cachedIn(viewModelScope)
 
     private fun setGalleryCount(filmId: Int) {
         _galleryCount.value = 0
@@ -265,14 +252,46 @@ class CinemaViewModel @Inject constructor(
         }
     }
 
-    // FragmentGallery
-    private var galleryType: String = "STILL"
-
     fun setGalleryType(type: String) {
         if (GALLERY_TYPES.keys.contains(type)) galleryType = type
     }
 
+    // FragmentStaffDetail
+    private val _currentStaff = MutableStateFlow<ResponseStaffById?>(null)
+    val currentStaff = _currentStaff.asStateFlow()
+
+    private val _loadCurrentStaff = MutableStateFlow<StateLoading>(StateLoading.Default)
+    val loadCurrentStaff = _loadCurrentStaff.asStateFlow()
+
+    fun getStaffDetail(staffId: Int) {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                _loadCurrentStaff.value = StateLoading.Loading
+                val staff = getStaffByIdUseCase.executeStaffById(staffId)
+                _currentStaff.emit(staff)
+                _loadCurrentStaff.value = StateLoading.Success
+            } catch (e: Exception) {
+                _loadCurrentStaff.value = StateLoading.Error(e.message.toString())
+            }
+        }
+    }
+
     companion object {
+        private val calendar = Calendar.getInstance()
+
+        private var currentFilterParams = FilmFilterParams(
+            countries = "",
+            genres = "",
+            order = "RATING",
+            type = "",
+            ratingFrom = 0,
+            ratingTo = 10,
+            yearFrom = 1000,
+            yearTo = 3000,
+            imdbId = null,
+            keyword = ""
+        )
+
         data class HomeList(
             val category: CategoriesFilms,
             val filmList: List<HomeItem>

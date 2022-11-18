@@ -39,5 +39,6 @@
     <string name="season_episode_name">%d серия. %s</string>
     <string name="season_chip_name">%d</string>
     <string name="episodes_count">%d сезон, %s</string>
+    <string name="label_filmography">Фильмография</string>
 
 </resources>

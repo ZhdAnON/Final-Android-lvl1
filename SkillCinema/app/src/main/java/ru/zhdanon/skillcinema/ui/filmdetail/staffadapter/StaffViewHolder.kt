@@ -3,10 +3,10 @@ package ru.zhdanon.skillcinema.ui.filmdetail.staffadapter
 import androidx.recyclerview.widget.RecyclerView
 import ru.zhdanon.skillcinema.app.loadImage
 import ru.zhdanon.skillcinema.data.staffbyfilmid.ResponseStaffByFilmId
-import ru.zhdanon.skillcinema.databinding.ItemActorFilmDetailBinding
+import ru.zhdanon.skillcinema.databinding.ItemStaffDetailFilmBinding
 
 class StaffViewHolder(
-    private val binding: ItemActorFilmDetailBinding
+    private val binding: ItemStaffDetailFilmBinding
 ) : RecyclerView.ViewHolder(binding.root) {
 
     fun bindItem(item: ResponseStaffByFilmId, clickActor: (actor: ResponseStaffByFilmId) -> Unit) {

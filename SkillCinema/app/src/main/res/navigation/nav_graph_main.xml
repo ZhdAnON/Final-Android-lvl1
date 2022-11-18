@@ -74,6 +74,9 @@
             app:popUpTo="@id/fragmentStaffDetail"
             android:id="@+id/action_fragmentStaffDetail_to_fragmentFilmDetail"
             app:destination="@id/fragmentFilmDetail" />
+        <action
+            android:id="@+id/action_fragmentStaffDetail_to_fragmentFilmography"
+            app:destination="@id/fragmentFilmography" />
     </fragment>
     <fragment
         android:id="@+id/fragmentGallery"
@@ -122,5 +125,13 @@
         <argument
             android:name="seriesName"
             app:argType="string" />
+    </fragment>
+    <fragment
+        android:id="@+id/fragmentFilmography"
+        android:name="ru.zhdanon.skillcinema.ui.staffdetail.FragmentFilmography"
+        android:label="FragmentFilmography" >
+        <action
+            android:id="@+id/action_fragmentFilmography_to_fragmentFilmDetail"
+            app:destination="@id/fragmentFilmDetail" />
     </fragment>
 </navigation>

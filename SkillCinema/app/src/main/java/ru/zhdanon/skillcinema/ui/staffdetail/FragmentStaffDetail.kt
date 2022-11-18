@@ -8,12 +8,14 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import ru.zhdanon.skillcinema.R
 import ru.zhdanon.skillcinema.app.loadImage
 import ru.zhdanon.skillcinema.databinding.FragmentStaffDetailBinding
 import ru.zhdanon.skillcinema.entity.HomeItem
+import ru.zhdanon.skillcinema.ui.CinemaViewModel
 import ru.zhdanon.skillcinema.ui.StateLoading
 import ru.zhdanon.skillcinema.ui.home.filmrecycler.FilmAdapter
 
@@ -21,7 +23,7 @@ class FragmentStaffDetail : Fragment() {
     private var _binding: FragmentStaffDetailBinding? = null
     private val binding get() = _binding!!
 
-    private val viewModel: StaffViewModel by activityViewModels()
+    private val viewModel: CinemaViewModel by activityViewModels()
     private lateinit var filmAdapter: FilmAdapter
 
     override fun onCreateView(
@@ -45,7 +47,6 @@ class FragmentStaffDetail : Fragment() {
         getStaffInfo()
 
         binding.staffDetailBackBtn.setOnClickListener { requireActivity().onBackPressed() }
-
         binding.staffDetailShowAllFilmsBtn.setOnClickListener { getAllFilmsByStaff() }
     }
 
@@ -55,7 +56,7 @@ class FragmentStaffDetail : Fragment() {
     }
 
     private fun setBestFilmsAdapter() {
-        filmAdapter = FilmAdapter(20, {}, {})
+        filmAdapter = FilmAdapter(20, {}, { onClickFilm(it) })
         binding.staffDetailBestList.layoutManager =
             LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
         binding.staffDetailBestList.adapter = filmAdapter
@@ -100,37 +101,44 @@ class FragmentStaffDetail : Fragment() {
     private fun getStaffInfo() {
         viewLifecycleOwner.lifecycleScope.launchWhenStarted {
             viewModel.currentStaff.collect { staff ->
-                binding.apply {
-                    staffDetailPoster.loadImage(staff.posterUrl)
-                    staffDetailName.text = staff.nameRu ?: staff.nameEn ?: "Unknown name"
-                    if (staff.profession != null) staffDetailProfession.text = staff.profession
-                    else staffDetailProfession.isVisible = false
+                if (staff != null) {
+                    binding.apply {
+                        staffDetailPoster.loadImage(staff.posterUrl)
+                        staffDetailName.text = staff.nameRu ?: staff.nameEn ?: "Unknown name"
+                        if (staff.profession != null) staffDetailProfession.text = staff.profession
+                        else staffDetailProfession.isVisible = false
 
-                    if (staff.films != null) staffDetailFilmsCount.text =
-                        resources.getQuantityString(
-                            R.plurals.staff_details_film_count,
-                            staff.films.size,
-                            staff.films.size
-                        )
-                    if (staff.films != null) {
-                        val list: MutableList<HomeItem> = staff.films.toMutableList()
-                        list.removeAll { it.rating == null }
-                        val sortedList = list.sortedBy { it.rating?.toDouble() }.reversed()
-                        val result = mutableListOf<HomeItem>()
+                        if (staff.films != null) staffDetailFilmsCount.text =
+                            resources.getQuantityString(
+                                R.plurals.staff_details_film_count,
+                                staff.films.size,
+                                staff.films.size
+                            )
+                        if (staff.films != null) {
+                            val list: MutableList<HomeItem> = staff.films.toMutableList()
+                            list.removeAll { it.rating == null }
+                            val sortedList = list.sortedBy { it.rating?.toDouble() }.reversed()
+                            val result = mutableListOf<HomeItem>()
 
-                        if (sortedList.size > 10) {
-                            repeat(10) { result.add(sortedList[it]) }
-                        } else result.addAll(sortedList)
+                            if (sortedList.size > 10) {
+                                repeat(10) { result.add(sortedList[it]) }
+                            } else result.addAll(sortedList)
 
-                        result.sortedBy { it.rating }
-                        filmAdapter.submitList(result)
+                            result.sortedBy { it.rating }
+                            filmAdapter.submitList(result)
+                        }
                     }
                 }
             }
         }
     }
 
+    private fun onClickFilm(filmId: Int) {
+        viewModel.getFilmById(filmId)
+        findNavController().navigate(R.id.action_fragmentStaffDetail_to_fragmentFilmDetail)
+    }
+
     private fun getAllFilmsByStaff() {
-        // здесь будет код
+        findNavController().navigate(R.id.action_fragmentStaffDetail_to_fragmentFilmography)
     }
 }

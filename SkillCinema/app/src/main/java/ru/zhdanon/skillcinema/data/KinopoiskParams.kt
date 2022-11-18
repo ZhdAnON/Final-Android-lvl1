@@ -22,6 +22,21 @@ enum class Month(val count: Int) {
     DECEMBER(12)
 }
 
+val PROFESSIONS = mapOf(
+    "WRITER" to "Сценарист",
+    "OPERATOR" to "Оператор",
+    "EDITOR" to "Монтаж",
+    "COMPOSER" to "Композитор",
+    "PRODUCER_USSR" to "Режиссёр СССР",
+    "TRANSLATOR" to "Дубляж",
+    "DIRECTOR" to "Режиссёр",
+    "DESIGN" to "Художник-постановщик",
+    "PRODUCER" to "Продюссер",
+    "ACTOR" to "Актёр",
+    "VOICE_DIRECTOR" to "Звукорежиссёр",
+    "UNKNOWN" to "Неизвестно"
+)
+
 val GALLERY_TYPES = mapOf(
     "STILL" to "кадры",
     "SHOOTING" to "со съемок",
