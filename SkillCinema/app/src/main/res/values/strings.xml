@@ -41,5 +41,25 @@
     <string name="season_chip_name">%d</string>
     <string name="episodes_count">%d сезон, %s</string>
     <string name="label_filmography">Фильмография</string>
+    <string name="search_edittext_hint">Фильмы, актёры, режиссёры</string>
+
+    <!-- Search fragment -->
+    <string name="search_not_found">К сожалению, по Вашему\nничего не найдено</string>
+
+    <!-- Search setting fragment -->
+    <string name="search_settings_title">Настройки поиска</string>
+    <string name="search_settings_label_show">Показывать</string>
+    <string name="search_settings_radio_all">Все</string>
+    <string name="search_settings_radio_films">Фильмы</string>
+    <string name="search_settings_radio_series">Сериалы</string>
+    <string name="search_settings_rating_text">от %d до %d</string>
+    <string name="search_settings_country_label">Страна</string>
+    <string name="search_settings_genre_label">Жанр</string>
+    <string name="search_settings_rating_label">Рейтинг</string>
+    <string name="search_settings_year_label">Год</string>
+    <string name="search_settings_radio_popular">Популярность</string>
+    <string name="search_settings_radio_rating">Рейтинг</string>
+    <string name="search_settings_radio_date">Дата</string>
+    <string name="search_settings_sorting_label">Сортировать</string>
 
 </resources>

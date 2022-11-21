@@ -19,9 +19,15 @@
             app:destination="@id/fragmentAllFilms" />
     </fragment>
     <fragment
+        tools:layout="@layout/fragment_search"
         android:id="@+id/fragmentSearch"
         android:name="ru.zhdanon.skillcinema.ui.search.FragmentSearch"
-        android:label="FragmentSearch" />
+        android:label="FragmentSearch" >
+        <action
+            app:popUpTo="@id/fragmentSearch"
+            android:id="@+id/action_fragmentSearch_to_fragmentSearchSettings"
+            app:destination="@id/fragmentSearchSettings" />
+    </fragment>
     <fragment
         android:id="@+id/fragmentProfile"
         android:name="ru.zhdanon.skillcinema.ui.profile.FragmentProfile"
@@ -134,4 +140,9 @@
             android:id="@+id/action_fragmentFilmography_to_fragmentFilmDetail"
             app:destination="@id/fragmentFilmDetail" />
     </fragment>
+    <fragment
+        tools:layout="@layout/fragment_search_settings"
+        android:id="@+id/fragmentSearchSettings"
+        android:name="ru.zhdanon.skillcinema.ui.search.FragmentSearchSettings"
+        android:label="FragmentSearchSettings" />
 </navigation>

@@ -2,7 +2,7 @@ package ru.zhdanon.skillcinema.data
 
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
-import ru.zhdanon.skillcinema.data.filmbyfilter.FilmByFilter
+import ru.zhdanon.skillcinema.data.filmbyfilter.ResponseByFilter
 import ru.zhdanon.skillcinema.data.filmspremier.FilmPremier
 import ru.zhdanon.skillcinema.entity.HomeItem
 import javax.inject.Inject
@@ -13,6 +13,15 @@ class CinemaRepository @Inject constructor() {
         .addConverterFactory(MoshiConverterFactory.create())
         .build()
         .create(KinopoiskApi::class.java)
+
+    // FragmentHome
+    suspend fun getFilmsTop(topType: String, page: Int): List<HomeItem> {
+        return retrofit.getFilmsTop(type = topType, page = page).films
+    }
+
+    suspend fun getFilmsPremier(year: Int, month: String): List<FilmPremier> {
+        return retrofit.getPremier(year, month).items
+    }
 
     // FragmentFilmDetail
     suspend fun getFilmById(filmId: Int) = retrofit.getCurrentFilm(filmId)
@@ -30,7 +39,7 @@ class CinemaRepository @Inject constructor() {
     suspend fun getStaffById(staffId: Int) = retrofit.getStaff(staffId)
 
     // FragmentSearch
-    suspend fun getFilmsByFilter(filters: ParamsFilterFilm, page: Int): List<FilmByFilter> {
+    suspend fun getFilmsByFilter(filters: ParamsFilterFilm, page: Int): ResponseByFilter {
         return retrofit.getFilmsByFilter(
             countries = "",
             genres = "",
@@ -43,15 +52,7 @@ class CinemaRepository @Inject constructor() {
             imdbId = filters.imdbId,
             keyword = filters.keyword,
             page = page
-        ).items
-    }
-
-    suspend fun getFilmsTop(topType: String, page: Int): List<HomeItem> {
-        return retrofit.getFilmsTop(type = topType, page = page).films
-    }
-
-    suspend fun getFilmsPremier(year: Int, month: String): List<FilmPremier> {
-        return retrofit.getPremier(year, month).items
+        )
     }
 
     companion object {

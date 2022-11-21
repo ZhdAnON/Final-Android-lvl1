@@ -10,31 +10,24 @@ class FilmsByFilterPagingSource(
     private val filters: ParamsFilterFilm,
     private val getFilmListUseCase: GetFilmListUseCase
 ) : PagingSource<Int, HomeItem>() {
-    override fun getRefreshKey(state: PagingState<Int, HomeItem>): Int = FIRST_PAGE
-
-    override suspend fun load(params: LoadParams<Int>): LoadResult<Int, HomeItem> {
-        val page = params.key ?: FIRST_PAGE
-        return kotlin.runCatching {
-            getFilmListUseCase
-                .executeFilmsByFilter(
-                    filters = filters,
-                    page = page
-                )
-        }.fold(
-            onSuccess = {
-                LoadResult.Page(
-                    data = it,
-                    prevKey = null,
-                    nextKey = if (it.isEmpty()) null else page + 1
-                )
-            },
-            onFailure = {
-                LoadResult.Error(it)
-            }
-        )
+    override fun getRefreshKey(state: PagingState<Int, HomeItem>): Int? {
+        val anchorPosition = state.anchorPosition ?: return null
+        val page = state.closestPageToPosition(anchorPosition) ?: return null
+        return page.prevKey?.plus(1) ?: page.nextKey?.minus(1)
     }
 
-    private companion object {
-        private const val FIRST_PAGE = 1
+    override suspend fun load(params: LoadParams<Int>): LoadResult<Int, HomeItem> {
+        val page = params.key ?: 1
+        val pageSize = params.loadSize.coerceAtMost(20)
+
+        val response = getFilmListUseCase.executeFilmsByFilterCount(filters, page)
+        return if (response.total != 0) {
+            val items = response.items
+            val nextKey = if (items.size < pageSize) null else page + 1
+            val prevKey = if (page == 1) null else page - 1
+            LoadResult.Page(items, prevKey, nextKey)
+        } else {
+            LoadResult.Error(Exception())
+        }
     }
 }

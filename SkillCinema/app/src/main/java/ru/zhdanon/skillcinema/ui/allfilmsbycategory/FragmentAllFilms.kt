@@ -48,22 +48,27 @@ class FragmentAllFilms : Fragment() {
             GridLayoutManager(requireContext(), 2, GridLayoutManager.VERTICAL, false)
         binding.allFilmsList.adapter = viewModel.getAllFilmAdapter()
 
-        viewLifecycleOwner.lifecycleScope.launchWhenStarted {
-            viewModel.getAllFilmAdapter().loadStateFlow.collect { state ->
-                val currentState = state.refresh
-                binding.progressGroup.isVisible = currentState == LoadState.Loading
-                binding.loadingRefreshBtn.isVisible = currentState != LoadState.Loading
-                when (currentState) {
-                    is LoadState.Error -> {
-                        binding.allFilmsList.isVisible = false
-                        binding.progressGroup.isVisible = true
-                        binding.loadingProgress.isVisible = false
-                    }
-                    else -> {
-                        binding.allFilmsList.isVisible = true
-                        binding.progressGroup.isVisible = false
-                        binding.loadingProgress.isVisible = false
-                    }
+        viewModel.getAllFilmAdapter().addLoadStateListener { state ->
+            val currentState = state.refresh
+            binding.allFilmsList.isVisible = currentState != LoadState.Loading
+            binding.progressGroup.isVisible = currentState == LoadState.Loading
+            binding.loadingRefreshBtn.isVisible = currentState != LoadState.Loading
+
+            when(currentState) {
+                is LoadState.Loading -> {
+                    binding.allFilmsList.isVisible = false
+                    binding.progressGroup.isVisible = true
+                    binding.loadingRefreshBtn.isVisible = false
+                }
+                is LoadState.NotLoading -> {
+                    binding.allFilmsList.isVisible = true
+                    binding.progressGroup.isVisible = false
+                    binding.loadingRefreshBtn.isVisible = true
+                }
+                else -> {
+                    binding.allFilmsList.isVisible = false
+                    binding.loadingProgress.isVisible = false
+                    binding.loadingRefreshBtn.isVisible = true
                 }
             }
         }
