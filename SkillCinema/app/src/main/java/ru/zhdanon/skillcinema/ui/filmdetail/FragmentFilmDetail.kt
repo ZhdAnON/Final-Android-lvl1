@@ -12,6 +12,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.coroutines.launch
@@ -47,6 +48,9 @@ class FragmentFilmDetail : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        val args: FragmentFilmDetailArgs by navArgs()
+        viewModel.getFilmById(args.filmId)
 
         stateLoadingListener()              // Установка слушателя состояния загрузки
 

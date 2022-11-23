@@ -133,8 +133,9 @@ class FragmentStaffDetail : Fragment() {
     }
 
     private fun onClickFilm(filmId: Int) {
-        viewModel.getFilmById(filmId)
-        findNavController().navigate(R.id.action_fragmentStaffDetail_to_fragmentFilmDetail)
+        val action =
+            FragmentStaffDetailDirections.actionFragmentStaffDetailToFragmentFilmDetail(filmId)
+        findNavController().navigate(action)
     }
 
     private fun getAllFilmsByStaff() {

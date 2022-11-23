@@ -54,8 +54,9 @@ class FragmentSimilarFilms : Fragment() {
     }
 
     private fun onClickFilm(filmId: Int) {
-        viewModel.getFilmById(filmId)
-        findNavController().navigate(R.id.action_fragmentSimilarFilms_to_fragmentFilmDetail)
+        val action =
+            FragmentSimilarFilmsDirections.actionFragmentSimilarFilmsToFragmentFilmDetail(filmId)
+        findNavController().navigate(action)
     }
 
     override fun onDestroyView() {

@@ -27,6 +27,9 @@
             app:popUpTo="@id/fragmentSearch"
             android:id="@+id/action_fragmentSearch_to_fragmentSearchSettings"
             app:destination="@id/fragmentSearchSettings" />
+        <action
+            android:id="@+id/action_fragmentSearch_to_fragmentFilmDetail"
+            app:destination="@id/fragmentFilmDetail" />
     </fragment>
     <fragment
         android:id="@+id/fragmentProfile"
@@ -57,6 +60,9 @@
             app:popUpTo="@id/fragmentFilmDetail"
             android:id="@+id/action_fragmentFilmDetail_to_fragmentSeries"
             app:destination="@id/fragmentSeries" />
+        <argument
+            android:name="filmId"
+            app:argType="integer" />
     </fragment>
     <fragment
         tools:layout="@layout/fragment_all_films"
@@ -144,5 +150,18 @@
         tools:layout="@layout/fragment_search_settings"
         android:id="@+id/fragmentSearchSettings"
         android:name="ru.zhdanon.skillcinema.ui.search.FragmentSearchSettings"
-        android:label="FragmentSearchSettings" />
+        android:label="FragmentSearchSettings" >
+        <action
+            android:id="@+id/action_fragmentSearchSettings_to_fragmentSearchFilters"
+            app:destination="@id/fragmentSearchFilters" />
+    </fragment>
+    <fragment
+        tools:layout="@layout/fragment_search_filters"
+        android:id="@+id/fragmentSearchFilters"
+        android:name="ru.zhdanon.skillcinema.ui.search.FragmentSearchFilters"
+        android:label="FragmentSearchFilters" >
+        <argument
+            android:name="filterType"
+            app:argType="string" />
+    </fragment>
 </navigation>

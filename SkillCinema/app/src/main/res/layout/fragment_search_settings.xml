@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -148,7 +149,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="end"
-                android:text="Россия"
+                tools:text="Россия"
                 android:textSize="14sp" />
 
         </FrameLayout>
@@ -174,7 +175,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="end"
-                android:text="Комедия"
+                tools:text="Комедия"
                 android:textSize="14sp" />
 
         </FrameLayout>
@@ -209,14 +210,14 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:paddingVertical="16dp"
             android:orientation="vertical">
 
             <FrameLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="26dp"
-                android:orientation="horizontal"
-                android:paddingVertical="16dp">
+                android:orientation="horizontal">
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -231,7 +232,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="end"
-                    android:text="любой"
+                    tools:text="любой"
                     android:textSize="14sp" />
 
             </FrameLayout>
@@ -243,7 +244,34 @@
                 android:layout_marginHorizontal="26dp"
                 android:autofillHints=""
                 android:valueFrom="1"
-                android:valueTo="10" />
+                app:values="@array/initial_slider_rating_values"
+                android:valueTo="10"
+                app:labelBehavior="gone" />
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingHorizontal="35dp">
+
+                <TextView
+                    android:id="@+id/search_settings_range_start"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="start"
+                    android:fontFamily="@font/graphik_regular"
+                    android:textSize="14sp"
+                    tools:text="1" />
+
+                <TextView
+                    android:id="@+id/search_settings_range_end"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="end"
+                    android:fontFamily="@font/graphik_regular"
+                    android:textSize="14sp"
+                    tools:text="10" />
+
+            </FrameLayout>
 
         </LinearLayout>
 

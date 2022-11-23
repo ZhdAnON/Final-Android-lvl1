@@ -285,8 +285,8 @@ class CinemaViewModel @Inject constructor(
         private val calendar = Calendar.getInstance()
 
         private var currentParamsFilterFilm = ParamsFilterFilm(
-            countries = "",
-            genres = "",
+            countries = emptyMap(),
+            genres = emptyMap(),
             order = "RATING",
             type = "",
             ratingFrom = 0,

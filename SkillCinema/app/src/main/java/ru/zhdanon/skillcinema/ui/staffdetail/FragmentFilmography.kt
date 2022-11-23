@@ -14,7 +14,6 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
-import ru.zhdanon.skillcinema.R
 import ru.zhdanon.skillcinema.data.PROFESSIONS
 import ru.zhdanon.skillcinema.data.staffbyid.StaffsFilms
 import ru.zhdanon.skillcinema.databinding.FragmentStaffFilmographyBinding
@@ -67,8 +66,9 @@ class FragmentFilmography : Fragment() {
     }
 
     private fun onFilmClick(filmId: Int) {
-        viewModel.getFilmById(filmId)
-        findNavController().navigate(R.id.action_fragmentFilmography_to_fragmentFilmDetail)
+        val action =
+            FragmentFilmographyDirections.actionFragmentFilmographyToFragmentFilmDetail(filmId)
+        findNavController().navigate(action)
     }
 
     private fun setChipButton(filmList: List<StaffsFilms>) {

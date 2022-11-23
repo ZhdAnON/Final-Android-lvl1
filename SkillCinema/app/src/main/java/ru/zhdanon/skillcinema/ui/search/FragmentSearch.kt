@@ -3,16 +3,14 @@ package ru.zhdanon.skillcinema.ui.search
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.View.OnFocusChangeListener
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -24,10 +22,8 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import ru.zhdanon.skillcinema.R
-import ru.zhdanon.skillcinema.data.ParamsFilterFilm
 import ru.zhdanon.skillcinema.databinding.FragmentSearchBinding
 import ru.zhdanon.skillcinema.ui.SearchViewModel
-import ru.zhdanon.skillcinema.ui.TAG
 import ru.zhdanon.skillcinema.ui.allfilmsbycategory.allfilmadapter.AllFilmAdapter
 
 @AndroidEntryPoint
@@ -36,7 +32,7 @@ class FragmentSearch : Fragment() {
     private var _binding: FragmentSearchBinding? = null
     private val binding get() = _binding!!
 
-    private val viewModel: SearchViewModel by viewModels()
+    private val viewModel: SearchViewModel by activityViewModels()
 
     private val adapter by lazy(LazyThreadSafetyMode.NONE) {
         AllFilmAdapter { onFilmClick(it) }
@@ -64,7 +60,9 @@ class FragmentSearch : Fragment() {
     }
 
     private fun onFilmClick(filmId: Int) {
-        Log.d(TAG, "onFilmClick: $filmId")
+        val action =
+            FragmentSearchDirections.actionFragmentSearchToFragmentFilmDetail(filmId)
+        findNavController().navigate(action)
     }
 
     private fun setAdapter() {
@@ -97,8 +95,7 @@ class FragmentSearch : Fragment() {
             }
         }
         binding.searchFilmList.layoutManager =
-            GridLayoutManager(requireContext(), 3, GridLayoutManager.VERTICAL, false)
-
+            GridLayoutManager(requireContext(), 2, GridLayoutManager.VERTICAL, false)
         binding.searchFilmList.adapter = adapter
     }
 
@@ -106,14 +103,12 @@ class FragmentSearch : Fragment() {
         binding.searchMyField.onFocusChangeListener = OnFocusChangeListener { _, hasFocus ->
             binding.searchGroup.background = if (hasFocus) {
                 isEditFocused = true
-                Toast.makeText(requireContext(), "FOCUS", Toast.LENGTH_SHORT).show()
                 ResourcesCompat.getDrawable(
                     resources,
                     R.drawable.search_input_field_select,
                     null
                 )
             } else {
-                Toast.makeText(requireContext(), "CLEAR FOCUS", Toast.LENGTH_SHORT).show()
                 ResourcesCompat.getDrawable(resources, R.drawable.search_input_field, null)
             }
         }
@@ -125,9 +120,7 @@ class FragmentSearch : Fragment() {
                 viewLifecycleOwner.lifecycleScope.launchWhenStarted {
                     delay(500)
                     viewModel.updateFilters(
-                        filterFilm = ParamsFilterFilm(
-                            keyword = s.toString()
-                        )
+                        filterFilm = viewModel.getFilters().copy(keyword = s.toString())
                     )
                     adapter.refresh()
                 }

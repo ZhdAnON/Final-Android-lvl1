@@ -11,7 +11,6 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.paging.LoadState
 import androidx.recyclerview.widget.GridLayoutManager
-import ru.zhdanon.skillcinema.R
 import ru.zhdanon.skillcinema.data.CategoriesFilms
 import ru.zhdanon.skillcinema.databinding.FragmentAllFilmsBinding
 import ru.zhdanon.skillcinema.ui.CinemaViewModel
@@ -54,7 +53,7 @@ class FragmentAllFilms : Fragment() {
             binding.progressGroup.isVisible = currentState == LoadState.Loading
             binding.loadingRefreshBtn.isVisible = currentState != LoadState.Loading
 
-            when(currentState) {
+            when (currentState) {
                 is LoadState.Loading -> {
                     binding.allFilmsList.isVisible = false
                     binding.progressGroup.isVisible = true
@@ -91,8 +90,8 @@ class FragmentAllFilms : Fragment() {
     }
 
     private fun onClickFilm(filmId: Int) {
-        viewModel.getFilmById(filmId)
-        findNavController().navigate(R.id.action_fragmentAllFilms_to_fragmentFilmDetail)
+        val action = FragmentAllFilmsDirections.actionFragmentAllFilmsToFragmentFilmDetail(filmId)
+        findNavController().navigate(action)
     }
 
     override fun onDestroyView() {

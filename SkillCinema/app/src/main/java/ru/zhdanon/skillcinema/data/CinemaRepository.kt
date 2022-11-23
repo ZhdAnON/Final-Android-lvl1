@@ -3,6 +3,7 @@ package ru.zhdanon.skillcinema.data
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 import ru.zhdanon.skillcinema.data.filmbyfilter.ResponseByFilter
+import ru.zhdanon.skillcinema.data.filmbyfilter.ResponseGenresCountries
 import ru.zhdanon.skillcinema.data.filmspremier.FilmPremier
 import ru.zhdanon.skillcinema.entity.HomeItem
 import javax.inject.Inject
@@ -41,8 +42,8 @@ class CinemaRepository @Inject constructor() {
     // FragmentSearch
     suspend fun getFilmsByFilter(filters: ParamsFilterFilm, page: Int): ResponseByFilter {
         return retrofit.getFilmsByFilter(
-            countries = "",
-            genres = "",
+            countries = if (filters.countries.isNotEmpty()) filters.countries.keys.first().toString() else "",
+            genres = if (filters.genres.isNotEmpty()) filters.genres.keys.first().toString() else "",
             order = filters.order,
             type = filters.type,
             ratingFrom = filters.ratingFrom,
@@ -53,6 +54,10 @@ class CinemaRepository @Inject constructor() {
             keyword = filters.keyword,
             page = page
         )
+    }
+
+    suspend fun getGenresCountries(): ResponseGenresCountries {
+        return retrofit.getGenresCountries()
     }
 
     companion object {

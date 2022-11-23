@@ -1,8 +1,8 @@
 package ru.zhdanon.skillcinema.data
 
 data class ParamsFilterFilm(
-    val countries: String = "",
-    val genres: String = "",
+    val countries: Map<Int, String> = emptyMap(),
+    val genres: Map<Int, String> = emptyMap(),
     val order: String = "RATING",
     val type: String = "",
     val ratingFrom: Int = 0,
