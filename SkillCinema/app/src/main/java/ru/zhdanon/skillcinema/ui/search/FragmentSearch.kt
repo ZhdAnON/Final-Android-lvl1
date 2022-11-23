@@ -57,6 +57,14 @@ class FragmentSearch : Fragment() {
         binding.searchFilterBtn.setOnClickListener {
             findNavController().navigate(R.id.action_fragmentSearch_to_fragmentSearchSettings)
         }
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.isFilterChanged.collect {
+                    if (it) adapter.refresh()
+                }
+            }
+        }
     }
 
     private fun onFilmClick(filmId: Int) {
@@ -122,7 +130,6 @@ class FragmentSearch : Fragment() {
                     viewModel.updateFilters(
                         filterFilm = viewModel.getFilters().copy(keyword = s.toString())
                     )
-                    adapter.refresh()
                 }
             }
 

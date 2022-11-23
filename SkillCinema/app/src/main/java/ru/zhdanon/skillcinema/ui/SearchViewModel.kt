@@ -28,6 +28,9 @@ class SearchViewModel @Inject constructor(
 ) : ViewModel() {
 
     private var filters = ParamsFilterFilm()
+    private val _isFilterChanged = MutableStateFlow(false)
+    val isFilterChanged = _isFilterChanged.asStateFlow()
+
 
     private val _countries = MutableStateFlow<List<FilterCountry>>(emptyList())
     val countries = _countries.asStateFlow()
@@ -52,7 +55,9 @@ class SearchViewModel @Inject constructor(
     fun getFilters() = filters
 
     fun updateFilters(filterFilm: ParamsFilterFilm) {
+        _isFilterChanged.value = false
         filters = filterFilm
+        _isFilterChanged.value = true
     }
 
     private fun getCountriesOrGenres() {
